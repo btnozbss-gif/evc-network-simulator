@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vestel EVC - Gelişmiş Simülasyon Merkezi</title>
+    <style>
+        :root {
+            --vestel-kirmizi: #E30613;
+            --arka-plan: #0B0E14;
+            --panel-arka: #151A23;
+            --metin-renk: #E0E0E0;
+            --border-renk: #2A313C;
+
+            --available: #00E676;
+            --charging: #00E5FF;
+            --preparing: #FFEA00;
+            --finishing: #D500F9;
+            --faulted: #FF1744;
+            --unavailable: #607D8B;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--arka-plan);
+            color: var(--metin-renk);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #login-ekrani {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(11, 14, 20, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-kutu {
+            background-color: var(--panel-arka);
+            border-top: 4px solid var(--vestel-kirmizi);
+            border-radius: 12px;
+            padding: 40px;
+            width: 320px;
+            text-align: center;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8);
+        }
+
+        .login-kutu h2 {
+            color: #FFF;
+            margin-top: 0;
+            letter-spacing: 2px;
+            font-weight: 800;
+        }
+
+        .login-kutu p {
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 25px;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 15px;
+            background-color: #0B0E14;
+            border: 1px solid var(--border-renk);
+            color: #FFF;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+            transition: 0.3s;
+        }
+
+        .login-input:focus {
+            border-color: var(--vestel-kirmizi);
+            outline: none;
+            box-shadow: 0 0 10px rgba(227, 6, 19, 0.3);
+        }
+
+        #login-hata {
+            color: var(--vestel-kirmizi);
+            font-size: 13px;
+            margin-bottom: 15px;
+            display: none;
+            font-weight: bold;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--vestel-kirmizi);
+            color: #FFF;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+            letter-spacing: 1px;
+        }
+
+        .login-btn:hover {
+            background-color: #B7050F;
+            transform: translateY(-2px);
+        }
+
+        #sol-panel {
+            width: 380px;
+            background-color: var(--panel-arka);
+            border-right: 1px solid var(--border-renk);
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+            box-sizing: border-box;
+            box-shadow: 5px 0 20px rgba(0, 0, 0, 0.4);
+            z-index: 10;
+        }
+
+        .baslik-kutu {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-renk);
+        }
+
+        .baslik-kutu h1 {
+            color: var(--vestel-kirmizi);
+            margin: 0;
+            font-size: 26px;
+            font-weight: 900;
+            letter-spacing: 2px;
+        }
+
+        .baslik-kutu p {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button {
+            background-color: var(--border-renk);
+            color: white;
+            border: 1px solid transparent;
+            padding: 12px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+            letter-spacing: 1px;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: #2c3545;
+            border-color: #555;
+        }
+
+        button:disabled {
+            background-color: #0B0E14;
+            color: #555;
+            cursor: not-allowed;
+            border-color: #111;
+        }
+
+        #btn-baglan {
+            background-color: #005A9E;
+            text-transform: uppercase;
+        }
+
+        #btn-baglan:hover:not(:disabled) {
+            background-color: #0078D4;
+        }
+
+        #btn-baslat {
+            background-color: var(--vestel-kirmizi);
+            text-transform: uppercase;
+        }
+
+        #btn-baslat:hover:not(:disabled) {
+            background-color: #B7050F;
+        }
+
+        #btn-durdur {
+            background-color: #FF9800;
+            color: #000;
+            text-transform: uppercase;
+        }
+
+        #btn-durdur:hover:not(:disabled) {
+            background-color: #F57C00;
+        }
+
+        #btn-sifirla {
+            text-transform: uppercase;
+        }
+
+        #btn-cikis {
+            margin-top: 15px;
+            background-color: transparent;
+            border: 1px solid var(--vestel-kirmizi);
+            color: var(--vestel-kirmizi);
+        }
+
+        #btn-cikis:hover {
+            background-color: rgba(227, 6, 19, 0.1);
+        }
+
+        .istatistik-kapsayici {
+            background-color: #0B0E14;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-renk);
+        }
+
+        .stat-baslik {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            font-weight: bold;
+            color: #888;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .stat-satir {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .stat-isim {
+            width: 80px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #bbb;
+        }
+
+        .stat-bar-arkaplan {
+            flex-grow: 1;
+            height: 8px;
+            background-color: #1A212D;
+            border-radius: 4px;
+            margin: 0 15px;
+            overflow: hidden;
+        }
+
+        .stat-bar {
+            height: 100%;
+            width: 0%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .stat-deger {
+            width: 30px;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: right;
+            font-family: monospace;
+        }
+
+        .bg-available {
+            background-color: var(--available);
+            box-shadow: 0 0 8px var(--available);
+        }
+
+        .bg-preparing {
+            background-color: var(--preparing);
+            box-shadow: 0 0 8px var(--preparing);
+        }
+
+        .bg-charging {
+            background-color: var(--charging);
+            box-shadow: 0 0 8px var(--charging);
+        }
+
+        .bg-finishing {
+            background-color: var(--finishing);
+            box-shadow: 0 0 8px var(--finishing);
+        }
+
+        .bg-faulted {
+            background-color: var(--faulted);
+            box-shadow: 0 0 8px var(--faulted);
+        }
+
+        .bg-unavailable {
+            background-color: var(--unavailable);
+            box-shadow: 0 0 8px var(--unavailable);
+        }
+
+        #terminal {
+            flex-grow: 1;
+            background-color: #05070A;
+            border: 1px solid var(--border-renk);
+            border-radius: 8px;
+            padding: 15px;
+            overflow-y: auto;
+            font-family: 'Consolas', monospace;
+            font-size: 11px;
+            color: #999;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        #sag-panel {
+            flex-grow: 1;
+            padding: 30px;
+            overflow-y: auto;
+            background-image: radial-gradient(circle, #1a212d 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        #grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 20px;
+        }
+
+        .cihaz-kutu {
+            background-color: var(--panel-arka);
+            border: 1px solid var(--border-renk);
+            border-radius: 12px;
+            padding: 20px 15px;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .cihaz-kutu::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            transition: all 0.3s;
+        }
+
+        .cihaz-kutu:hover {
+            transform: translateY(-7px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.6);
+            background-color: #1C2331;
+        }
+
+        .cihaz-id {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #FFF;
+            letter-spacing: 1px;
+        }
+
+        .cihaz-durum {
+            font-size: 10px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            display: inline-block;
+            background-color: #0B0E14;
+            border: 1px solid transparent;
+        }
+
+        .st-available::before {
+            background-color: var(--available);
+        }
+
+        .st-available .cihaz-durum {
+            color: var(--available);
+            border-color: rgba(0, 230, 118, 0.3);
+        }
+
+        .st-preparing::before {
+            background-color: var(--preparing);
+        }
+
+        .st-preparing .cihaz-durum {
+            color: var(--preparing);
+            border-color: rgba(255, 234, 0, 0.3);
+        }
+
+        .st-charging::before {
+            background-color: var(--charging);
+            box-shadow: 0 0 15px var(--charging);
+        }
+
+        .st-charging {
+            border-color: rgba(0, 229, 255, 0.3);
+        }
+
+        .st-charging .cihaz-durum {
+            background-color: rgba(0, 229, 255, 0.1);
+            color: var(--charging);
+            border-color: var(--charging);
+        }
+
+        .st-finishing::before {
+            background-color: var(--finishing);
+        }
+
+        .st-finishing .cihaz-durum {
+            color: var(--finishing);
+            border-color: rgba(213, 0, 249, 0.3);
+        }
+
+        .st-faulted::before {
+            background-color: var(--faulted);
+            animation: flashTop 1s infinite;
+        }
+
+        .st-faulted .cihaz-durum {
+            color: var(--faulted);
+            border-color: rgba(255, 23, 68, 0.3);
+        }
+
+        .st-unavailable::before {
+            background-color: var(--unavailable);
+        }
+
+        .st-unavailable .cihaz-durum {
+            color: var(--unavailable);
+            border-color: rgba(96, 125, 139, 0.3);
+        }
+
+        @keyframes flashTop {
+            0% {
+                box-shadow: 0 0 5px var(--faulted);
+            }
+
+            50% {
+                box-shadow: 0 0 20px var(--faulted);
+            }
+
+            100% {
+                box-shadow: 0 0 5px var(--faulted);
+            }
+        }
+
+        .modal-arkaplan {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-icerik {
+            background-color: var(--panel-arka);
+            border: 1px solid var(--border-renk);
+            border-radius: 16px;
+            width: 700px;
+            padding: 0;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        .modal-baslik {
+            background-color: #0B0E14;
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-renk);
+        }
+
+        .modal-baslik h2 {
+            margin: 0;
+            color: #FFF;
+            font-size: 18px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-baslik h2::before {
+            content: "";
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background-color: var(--charging);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--charging);
+        }
+
+        .victron-ekran {
+            background: radial-gradient(circle at top, #1C2433 0%, #0B0E14 100%);
+            padding: 30px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-renk);
+            position: relative;
+        }
+
+        .gorsel-simulasyon-alani {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding: 0 20px;
+        }
+
+        .araba-alani {
+            position: relative;
+            width: 280px;
+            height: 130px;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .araba-svg {
+            width: 100%;
+            opacity: 0.3;
+            transition: all 0.5s ease;
+            filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.5));
+        }
+
+        .araba-svg.sarjda {
+            opacity: 1;
+            filter: drop-shadow(0 10px 20px rgba(0, 229, 255, 0.4));
+        }
+
+        .araba-svg #port-isik {
+            transition: all 0.5s;
+            fill: #444;
+        }
+
+        .araba-svg.sarjda #port-isik {
+            fill: var(--charging);
+            filter: drop-shadow(0 0 5px var(--charging));
+        }
+
+        .sarj-kablosu {
+            position: absolute;
+            right: -5px;
+            bottom: 35px;
+            width: 50px;
+            height: 4px;
+            background-color: #1A212D;
+            transform-origin: left;
+            transform: rotate(-5deg);
+            transition: all 0.5s ease;
+            opacity: 0;
+        }
+
+        .sarj-kablosu.aktif {
+            background-color: var(--charging);
+            box-shadow: 0 0 12px var(--charging);
+            opacity: 1;
+        }
+
+        .donut-container {
+            width: 170px;
+            height: 170px;
+            border-radius: 50%;
+            background: conic-gradient(#1A212D 100%, transparent 0);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            transition: background 0.4s;
+        }
+
+        .donut-inner {
+            width: 145px;
+            height: 145px;
+            background-color: #0B0E14;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: inset 0 5px 15px rgba(0, 0, 0, 0.8);
+            z-index: 2;
+        }
+
+        .v-power-deger {
+            font-size: 48px;
+            font-weight: 300;
+            color: #FFF;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            letter-spacing: -2px;
+            line-height: 1;
+        }
+
+        .v-power-birim {
+            font-size: 16px;
+            color: #888;
+            font-weight: bold;
+            margin-left: 2px;
+        }
+
+        .v-yuzde-deger {
+            font-size: 16px;
+            color: #888;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .v-detay-grid {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+        }
+
+        .v-detay-kutu {
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 15px 25px;
+            border-radius: 8px;
+            text-align: left;
+            min-width: 130px;
+        }
+
+        .v-detay-kutu p {
+            margin: 0 0 5px 0;
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .v-detay-kutu h4 {
+            margin: 0;
+            font-size: 20px;
+            color: #00E5FF;
+            font-weight: 600;
+            display: flex;
+            align-items: baseline;
+            gap: 5px;
+        }
+
+        .v-detay-kutu h4 span {
+            font-size: 12px;
+            color: #888;
+            font-weight: normal;
+        }
+
+        .modal-kontroller {
+            padding: 25px;
+            background-color: var(--panel-arka);
+        }
+
+        .kontrol-baslik {
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0 0 10px 0;
+            font-weight: bold;
+        }
+
+        .modal-buton-grup {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .modal-buton-grup button {
+            flex: 1;
+            padding: 10px;
+            font-size: 11px;
+            border-radius: 4px;
+            margin-bottom: 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: #1A212D;
+            color: #CCC;
+            font-weight: bold;
+        }
+
+        .modal-buton-grup button:hover {
+            background-color: #2A3548;
+            color: #FFF;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-auth-ok {
+            border-left: 3px solid #00E676 !important;
+        }
+
+        .btn-auth-err {
+            border-left: 3px solid #FF1744 !important;
+        }
+
+        .btn-stop {
+            border-left: 3px solid #D500F9 !important;
+        }
+
+        #modal-terminal {
+            background-color: #05070A;
+            border: 1px solid var(--border-renk);
+            height: 120px;
+            border-radius: 6px;
+            padding: 15px;
+            overflow-y: auto;
+            font-family: 'Consolas', monospace;
+            font-size: 11px;
+            color: #888;
+        }
+
+        .kapat-btn {
+            background: none;
+            color: #888;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+            line-height: 1;
+            transition: 0.3s;
+        }
+
+        .kapat-btn:hover {
+            color: #FFF;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="login-ekrani">
+        <div class="login-kutu">
+            <h2>VESTEL EVC</h2>
+            <p>Ağ Yönetim ve Simülasyon Merkezi</p>
+            <input type="text" id="kullanici-adi" class="login-input" placeholder="Kullanıcı Adı" autocomplete="off">
+            <input type="password" id="sifre" class="login-input" placeholder="Şifre">
+            <div id="login-hata">Yetkisiz Erişim! Lütfen tekrar deneyin.</div>
+            <button class="login-btn" onclick="girisYap()">SİSTEME GİRİŞ YAP</button>
+        </div>
+    </div>
+
+    <div id="sol-panel">
+        <div class="baslik-kutu">
+            <h1>VESTEL EVC</h1>
+            <p>High-End Simülasyon Merkezi</p>
+        </div>
+
+        <button id="btn-baglan" onclick="sunucuyaBaglan()">🔌 Sunucuya Bağlan</button>
+        <button id="btn-baslat" onclick="simulasyonuBaslat()" disabled>🚀 Döngüyü Başlat</button>
+        <button id="btn-durdur" onclick="simulasyonuDurdur()" disabled>🛑 Testi Durdur</button>
+        <button id="btn-sifirla" onclick="sistemiSifirla()" disabled>🔄 Sistemi Resetle</button>
+
+        <div class="istatistik-kapsayici" id="istatistik-panel">
+            <div class="stat-baslik">
+                <span>Filo Durumu</span>
+                <span>Toplam: <span id="stat-toplam">50</span> İstasyon</span>
+            </div>
+
+            <div class="stat-satir"><span class="stat-isim">AVAILABLE</span>
+                <div class="stat-bar-arkaplan">
+                    <div class="stat-bar bg-available" id="bar-available" style="width: 100%;"></div>
+                </div><span class="stat-deger" id="stat-available">50</span>
+            </div>
+            <div class="stat-satir"><span class="stat-isim">PREPARING</span>
+                <div class="stat-bar-arkaplan">
+                    <div class="stat-bar bg-preparing" id="bar-preparing"></div>
+                </div><span class="stat-deger" id="stat-preparing">0</span>
+            </div>
+            <div class="stat-satir"><span class="stat-isim">CHARGING</span>
+                <div class="stat-bar-arkaplan">
+                    <div class="stat-bar bg-charging" id="bar-charging"></div>
+                </div><span class="stat-deger" id="stat-charging">0</span>
+            </div>
+            <div class="stat-satir"><span class="stat-isim">FINISHING</span>
+                <div class="stat-bar-arkaplan">
+                    <div class="stat-bar bg-finishing" id="bar-finishing"></div>
+                </div><span class="stat-deger" id="stat-finishing">0</span>
+            </div>
+            <div class="stat-satir"><span class="stat-isim">FAULTED</span>
+                <div class="stat-bar-arkaplan">
+                    <div class="stat-bar bg-faulted" id="bar-faulted"></div>
+                </div><span class="stat-deger" id="stat-faulted">0</span>
+            </div>
+            <div class="stat-satir">
+                <span class="stat-isim">UNAVAILABLE</span>
+                <div class="stat-bar-arkaplan">
+                    <div class="stat-bar bg-unavailable" id="bar-unavailable"></div>
+                </div>
+                <span class="stat-deger" id="stat-unavailable">0</span>
+            </div>
+        </div>
+
+        <div id="terminal">
+            > Sistem başlatılıyor...<br>
+            > Giriş bekleniyor.<br>
+        </div>
+
+        <button id="btn-cikis" onclick="cikisYap()">🚪 ÇIKIŞ YAP</button>
+    </div>
+
+    <div id="sag-panel">
+        <div id="grid-container"></div>
+    </div>
+
+    <div id="istasyon-modal" class="modal-arkaplan">
+        <div class="modal-icerik">
+            <div class="modal-baslik">
+                <h2 id="modal-istasyon-isim">VESTEL_01 EV CHARGER</h2>
+                <button class="kapat-btn" onclick="modalKapat()">&times;</button>
+            </div>
+
+            <div class="victron-ekran">
+
+                <div class="gorsel-simulasyon-alani">
+                    <div class="araba-alani">
+                        <svg class="araba-svg" id="sim-araba" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M 20 55 L 20 40 L 45 35 L 75 15 L 135 15 L 165 35 L 185 40 L 190 55 Z"
+                                fill="#1C2331" stroke="#333" stroke-width="2" stroke-linejoin="round" />
+                            <path d="M 80 18 L 130 18 L 155 33 L 80 33 Z" fill="#0B0E14" />
+                            <path d="M 75 18 L 75 33 L 50 33 Z" fill="#0B0E14" />
+                            <circle cx="50" cy="55" r="12" fill="#0B0E14" stroke="#444" stroke-width="3" />
+                            <circle cx="150" cy="55" r="12" fill="#0B0E14" stroke="#444" stroke-width="3" />
+                            <rect x="172" y="42" width="6" height="4" rx="2" fill="#444" id="port-isik" />
+                        </svg>
+                        <div class="sarj-kablosu" id="sim-kablo"></div>
+                    </div>
+
+                    <div class="donut-container" id="modal-donut">
+                        <div class="donut-inner">
+                            <div style="display:flex; align-items:baseline;">
+                                <span class="v-power-deger" id="modal-kw-deger">0.0</span>
+                                <span class="v-power-birim">kW</span>
+                            </div>
+                            <div class="v-yuzde-deger" id="modal-yuzde-deger">%0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="v-detay-grid">
+                    <div class="v-detay-kutu">
+                        <p>Total Energy</p>
+                        <h4 id="modal-kwh-deger">0.00 <span>kWh</span></h4>
+                    </div>
+                    <div class="v-detay-kutu">
+                        <p>Connector</p>
+                        <h4 style="color:#FFF;">Type 2 <span>AC</span></h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-kontroller">
+                <p class="kontrol-baslik">Durum (State) Müdahalesi (Admin Override)</p>
+                <div class="modal-buton-grup">
+                    <button onclick="manuelDurumAyarla('Available')">AVAILABLE</button>
+                    <button onclick="manuelDurumAyarla('Preparing')">PREPARING</button>
+                    <button onclick="manuelDurumAyarla('Charging')">CHARGING</button>
+                    <button onclick="manuelDurumAyarla('Unavailable')"
+                        style="border-left: 3px solid #FF9800;">UNAVAILABLE (BAKIM)</button> <button
+                        onclick="manuelDurumAyarla('Faulted')">FAULT</button>
+                </div>
+
+                <p class="kontrol-baslik">Donanım Simülasyonu (Transaction Tests)</p>
+                <div class="modal-buton-grup">
+                    <button class="btn-auth-ok" onclick="manuelIslem('AuthGecerli')">RFID OKUT (GEÇERLİ)</button>
+                    <button class="btn-auth-err" onclick="manuelIslem('AuthGecersiz')">RFID OKUT (GEÇERSİZ)</button>
+                    <button class="btn-stop" onclick="manuelIslem('Stop')">ŞARJI BİTİR (STOPTX)</button>
+                </div>
+
+                <p class="kontrol-baslik">İstasyon İletişim Logları (OCPP)</p>
+                <div id="modal-terminal"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let makine;
+        let simulasyonDöngüsü = null;
+        let gorselMotorDöngüsü = null;
+        const istasyonSayisi = 50;
+        const istasyonlar = [];
+        let aktifModalIstasyonu = null;
+        const olasiHatalar = ["HighTemperature", "ReaderFailure", "GroundFailure"];
+        const terminal = document.getElementById("terminal");
+        const grid = document.getElementById("grid-container");
+
+        window.onload = function () {
+            if (sessionStorage.getItem("oturum_gecerli") === "evet") {
+                document.getElementById("login-ekrani").style.display = "none";
+                sistemiHazirla();
+                logYaz("Mevcut oturum algılandı. Sisteme yeniden bağlanıldı.", "#00E676");
+            }
+        };
+
+        document.getElementById("sifre").addEventListener("keypress", function (event) {
+            if (event.key === "Enter") girisYap();
+        });
+
+        function girisYap() {
+            const kulAdi = document.getElementById("kullanici-adi").value;
+            const sfr = document.getElementById("sifre").value;
+            const hataMesaji = document.getElementById("login-hata");
+
+            if (kulAdi === "admin" && sfr === "vestel123") {
+                document.getElementById("login-ekrani").style.display = "none";
+
+                sessionStorage.setItem("oturum_gecerli", "evet");
+
+                logYaz("Sistem yöneticisi (admin) başarıyla doğrulandı.", "#00E676");
+                sistemiHazirla();
+            } else {
+                hataMesaji.style.display = "block";
+                document.getElementById("sifre").value = "";
+            }
+        }
+
+        function cikisYap() {
+            sessionStorage.removeItem("oturum_gecerli");
+
+            if (simulasyonDöngüsü) simulasyonuDurdur();
+
+            document.getElementById("login-ekrani").style.display = "flex";
+            document.getElementById("sifre").value = "";
+            document.getElementById("kullanici-adi").value = "";
+            document.getElementById("login-hata").style.display = "none";
+
+            logYaz("Sistemden çıkış yapıldı. Oturum kilitlendi.", "#FF9800");
+        }
+
+        function sistemiHazirla() {
+            grid.innerHTML = "";
+            istasyonlar.length = 0;
+            for (let i = 1; i <= istasyonSayisi; i++) {
+                let idNumarasi = i.toString().padStart(2, '0');
+                let istasyonId = "VESTEL_" + idNumarasi;
+
+                let istasyon = {
+                    id: istasyonId, status: "Available", transactionId: null, islemBekliyor: false,
+                    sarjYuzdesi: 0, anlikKw: 0.0, harcananKwh: 0.00, logs: []
+                };
+                istasyonlar.push(istasyon);
+
+                let kutu = document.createElement("div");
+                kutu.className = "cihaz-kutu st-available";
+                kutu.id = "kutu-" + istasyonId;
+                kutu.onclick = () => modalAc(istasyonId);
+                kutu.innerHTML = `<div class="cihaz-id">${istasyonId}</div><div class="cihaz-durum" id="durum-${istasyonId}">AVAILABLE</div>`;
+                grid.appendChild(kutu);
+            }
+            istatistikleriHesapla();
+        }
+
+        function logYaz(mesaj, renk = "#aaa", istasyonId = null) {
+            const saat = new Date().toLocaleTimeString();
+            const logSatiri = `<span style="color: #444;">[${saat}]</span> <span style="color: ${renk};">${mesaj}</span><br>`;
+
+            terminal.insertAdjacentHTML('beforeend', logSatiri);
+
+            if (terminal.childElementCount > 300) {
+                terminal.removeChild(terminal.firstChild);
+                terminal.removeChild(terminal.firstChild);
+            }
+            terminal.scrollTop = terminal.scrollHeight;
+
+            if (istasyonId) {
+                const cihaz = istasyonlar.find(c => c.id === istasyonId);
+                if (cihaz) {
+                    cihaz.logs.push(logSatiri);
+                    if (aktifModalIstasyonu === istasyonId) {
+                        const mTerminal = document.getElementById("modal-terminal");
+                        mTerminal.innerHTML += logSatiri;
+                        mTerminal.scrollTop = mTerminal.scrollHeight;
+                    }
+                }
+            }
+        }
+
+        function sunucuyaBaglan() {
+            logYaz("Bağlantı kuruluyor...", "#FF9800");
+            makine = new WebSocket("ws://localhost:8887");
+
+            makine.onopen = function () {
+                logYaz("Bağlantı Başarılı!", "#00E676");
+                document.getElementById("btn-baglan").disabled = true;
+                document.getElementById("btn-baslat").disabled = false;
+                document.getElementById("btn-sifirla").disabled = false;
+                topluBootGonder();
+            };
+
+            makine.onmessage = function (event) {
+                const data = JSON.parse(event.data);
+
+                if (data[0] === 3) {
+                    const msgId = data[1]; const payload = data[2];
+                    const parts = msgId.split('_');
+                    if (parts.length < 3) return;
+                    const komut = parts[0]; const stationId = parts[1] + "_" + parts[2];
+                    const cihaz = istasyonlar.find(c => c.id === stationId);
+
+                    if (!cihaz) return;
+
+                    if (komut === "auth") {
+                        if (payload.idTagInfo && payload.idTagInfo.status === "Accepted") {
+                            logYaz(`[RECV] ${cihaz.id} <- Authorize ACCEPTED`, "#00E676", cihaz.id);
+                            logYaz(`[DONANIM] Röleler kapanıyor, CP haberleşmesi başlatıldı...`, "#00E5FF", cihaz.id);
+                            setTimeout(() => { startTransactionYolla(cihaz); }, 3000);
+                        } else {
+                            logYaz(`[RECV] ${cihaz.id} <- Authorize REJECTED!`, "#FF1744", cihaz.id);
+                            durumuSunucuyaYolla(cihaz, "Available");
+                            cihaz.islemBekliyor = false;
+                        }
+                    }
+                    else if (komut === "start") {
+                        if (payload.idTagInfo && payload.idTagInfo.status === "Accepted") {
+                            cihaz.transactionId = payload.transactionId;
+                            logYaz(`[RECV] ${cihaz.id} <- StartTx ACCEPTED (ID: ${cihaz.transactionId})`, "#00E676", cihaz.id);
+                            cihaz.sarjYuzdesi = 0; cihaz.harcananKwh = 0.00;
+                            durumuSunucuyaYolla(cihaz, "Charging");
+                            cihaz.islemBekliyor = false;
+                        }
+                    }
+                    else if (komut === "stop") {
+                        logYaz(`[RECV] ${cihaz.id} <- StopTx ACCEPTED`, "#00E676", cihaz.id);
+                        cihaz.transactionId = null; cihaz.anlikKw = 0.0;
+                        durumuSunucuyaYolla(cihaz, "Finishing");
+                    }
+                }
+            };
+
+            makine.onclose = function () {
+                logYaz("Sunucu bağlantısı koptu!", "#FF1744");
+                simulasyonuDurdur();
+                document.getElementById("btn-baglan").disabled = false;
+                document.getElementById("btn-baslat").disabled = true;
+                document.getElementById("btn-sifirla").disabled = true;
+            };
+        }
+
+        function topluBootGonder() {
+            logYaz("Filo uyandırılıyor (BootNotification)...", "#00E5FF");
+            let baglananCihazSayisi = 0;
+            istasyonlar.forEach((istasyon) => {
+                let rastgeleGecikme = Math.random() * 5000;
+                setTimeout(() => {
+                    const msgId = "boot_" + istasyon.id + "_" + Date.now();
+                    const bootMesaji = [2, msgId, "BootNotification", { "stationId": istasyon.id, "chargePointVendor": "Vestel", "chargePointModel": "EVC_PRO" }];
+                    makine.send(JSON.stringify(bootMesaji));
+                    logYaz(`[BOOT] ${istasyon.id} Online`, "#00E5FF", istasyon.id);
+                    baglananCihazSayisi++;
+                    if (baglananCihazSayisi === istasyonSayisi) {
+                        logYaz("Tüm cihazlar ağa katıldı.", "#00E676");
+                    }
+                }, rastgeleGecikme);
+            });
+        }
+
+        function authorizeYolla(cihaz, gecerliMi) {
+            const idTag = gecerliMi ? "A1B2C3D4" : "KORSAN_KART";
+            const msgId = "auth_" + cihaz.id + "_" + Date.now();
+            const mesaj = [2, msgId, "Authorize", { "idTag": idTag }];
+            makine.send(JSON.stringify(mesaj));
+            logYaz(`[SEND] ${cihaz.id} -> Authorize (${idTag})`, "#FFEA00", cihaz.id);
+        }
+
+        function startTransactionYolla(cihaz) {
+            const msgId = "start_" + cihaz.id + "_" + Date.now();
+            const mesaj = [2, msgId, "StartTransaction", { "stationId": cihaz.id, "idTag": "A1B2C3D4", "meterStart": 0, "timestamp": new Date().toISOString() }];
+            makine.send(JSON.stringify(mesaj));
+            logYaz(`[SEND] ${cihaz.id} -> StartTransaction`, "#00E5FF", cihaz.id);
+        }
+
+        function stopTransactionYolla(cihaz) {
+            if (!cihaz.transactionId) { durumuSunucuyaYolla(cihaz, "Finishing"); return; }
+            const msgId = "stop_" + cihaz.id + "_" + Date.now();
+            const mesaj = [2, msgId, "StopTransaction", { "stationId": cihaz.id, "transactionId": cihaz.transactionId, "meterStop": parseInt(parseFloat(cihaz.harcananKwh) * 1000), "timestamp": new Date().toISOString(), "idTag": "A1B2C3D4" }];
+            makine.send(JSON.stringify(mesaj));
+            logYaz(`[SEND] ${cihaz.id} -> StopTx (ID: ${cihaz.transactionId})`, "#D500F9", cihaz.id);
+        }
+
+        function simulasyonuBaslat() {
+            if (!makine || makine.readyState !== WebSocket.OPEN) return;
+            document.getElementById("btn-baslat").disabled = true; document.getElementById("btn-durdur").disabled = false; document.getElementById("btn-sifirla").disabled = true;
+            logYaz("🚀 İŞLEM DÖNGÜSÜ BAŞLATILDI!", "#FFEA00");
+
+            simulasyonDöngüsü = setInterval(() => {
+                const secilenCihaz = istasyonlar[Math.floor(Math.random() * istasyonlar.length)];
+                if (Math.random() > 0.6) kalpAtisiYolla(secilenCihaz.id);
+                else otomatikDurumIlerlet(secilenCihaz);
+            }, 1000);
+
+            gorselMotorDöngüsü = setInterval(() => {
+                istasyonlar.forEach(cihaz => {
+                    if (cihaz.status === "Charging") {
+                        cihaz.sarjYuzdesi += Math.floor(Math.random() * 3) + 1;
+                        cihaz.anlikKw = (Math.random() * 1.5 + 20.5).toFixed(1);
+                        cihaz.harcananKwh = (cihaz.sarjYuzdesi * 0.45).toFixed(2);
+
+                        if (cihaz.sarjYuzdesi >= 100 && cihaz.transactionId) {
+                            cihaz.sarjYuzdesi = 100;
+                            stopTransactionYolla(cihaz);
+                            cihaz.transactionId = null;
+                        }
+                    }
+                });
+                modalGorselleriniGuncelle();
+            }, 500);
+        }
+
+        function simulasyonuDurdur() {
+            clearInterval(simulasyonDöngüsü); clearInterval(gorselMotorDöngüsü);
+            document.getElementById("btn-baslat").disabled = false; document.getElementById("btn-durdur").disabled = true; document.getElementById("btn-sifirla").disabled = false;
+            logYaz("🛑 Simülasyon duraklatıldı.", "#FF9800");
+        }
+
+        function sistemiSifirla() {
+            logYaz("🔄 SİSTEM SIFIRLANIYOR...", "#00E676");
+            terminal.innerHTML = "> Terminal temizlendi.<br>";
+            istasyonlar.forEach((istasyon, index) => {
+                setTimeout(() => {
+                    istasyon.status = "Available"; istasyon.transactionId = null;
+                    istasyon.sarjYuzdesi = 0; istasyon.anlikKw = 0.0; istasyon.harcananKwh = 0.00; istasyon.logs = []; istasyon.islemBekliyor = false;
+                    arayuzuGuncelle(istasyon.id, "Available"); istatistikleriHesapla();
+                    const mesaj = [2, "st_reset_" + Date.now(), "StatusNotification", { "stationId": istasyon.id, "connectorId": 1, "status": "Available", "errorCode": "NoError" }];
+                    makine.send(JSON.stringify(mesaj));
+                }, index * 10);
+            });
+            if (aktifModalIstasyonu) modalAc(aktifModalIstasyonu);
+        }
+
+        function kalpAtisiYolla(id) {
+            makine.send(JSON.stringify([2, "hb_" + Date.now(), "Heartbeat", { "stationId": id }]));
+            logYaz(`[HEARTBEAT] ${id} Ping`, "#666", id);
+        }
+
+        function otomatikDurumIlerlet(cihaz) {
+            if (cihaz.islemBekliyor) return;
+            if (Math.random() < 0.02) { durumuSunucuyaYolla(cihaz, "Faulted"); return; }
+            switch (cihaz.status) {
+                case "Available": durumuSunucuyaYolla(cihaz, "Preparing"); break;
+                case "Preparing":
+                    cihaz.islemBekliyor = true;
+                    let kartGecerliMi = Math.random() < 0.8;
+                    authorizeYolla(cihaz, kartGecerliMi);
+                    break;
+                case "Finishing":
+                case "Faulted": durumuSunucuyaYolla(cihaz, "Available"); break;
+            }
+        }
+
+        function durumuSunucuyaYolla(cihaz, yeniDurum) {
+            let gidenHata = "NoError";
+            if (yeniDurum === "Faulted") gidenHata = olasiHatalar[Math.floor(Math.random() * olasiHatalar.length)];
+
+            cihaz.status = yeniDurum;
+            arayuzuGuncelle(cihaz.id, yeniDurum);
+            istatistikleriHesapla();
+
+            makine.send(JSON.stringify([2, "st_" + cihaz.id + "_" + Date.now(), "StatusNotification", { "stationId": cihaz.id, "connectorId": 1, "status": yeniDurum, "errorCode": gidenHata }]));
+
+            let logMesaji = `[STATUS] ${cihaz.id} -> ${yeniDurum}`;
+            if (yeniDurum === "Faulted") logMesaji += ` (${gidenHata})`;
+            logYaz(logMesaji, "#ccc", cihaz.id);
+            modalGorselleriniGuncelle();
+        }
+
+        function arayuzuGuncelle(id, durum) {
+            const kutu = document.getElementById("kutu-" + id);
+            const durumMetni = document.getElementById("durum-" + id);
+            kutu.className = "cihaz-kutu st-" + durum.toLowerCase();
+            durumMetni.innerText = durum.toLocaleUpperCase('en-US');
+        }
+
+        function mantikliGecisMi(eskiDurum, yeniDurum) {
+            if (yeniDurum === "Faulted" || yeniDurum === "Unavailable") return true;
+            switch (eskiDurum) {
+                case "Available": return yeniDurum === "Preparing";
+                case "Preparing": return yeniDurum === "Charging" || yeniDurum === "Available";
+                case "Charging": return yeniDurum === "Finishing";
+                case "Finishing": return yeniDurum === "Available";
+                case "Faulted": return yeniDurum === "Available";
+                case "Unavailable": return yeniDurum === "Available";
+                default: return false;
+            }
+        }
+
+        function istatistikleriHesapla() {
+            const arr = istasyonlar.map(c => c.status);
+            const counts = {
+                Available: arr.filter(s => s === "Available").length,
+                Preparing: arr.filter(s => s === "Preparing").length,
+                Charging: arr.filter(s => s === "Charging").length,
+                Finishing: arr.filter(s => s === "Finishing").length,
+                Faulted: arr.filter(s => s === "Faulted").length,
+                Unavailable: arr.filter(s => s === "Unavailable").length
+            };
+            for (const [durum, sayi] of Object.entries(counts)) {
+                document.getElementById(`stat-${durum.toLowerCase()}`).innerText = sayi;
+                document.getElementById(`bar-${durum.toLowerCase()}`).style.width = `${(sayi / istasyonSayisi) * 100}%`;
+            }
+        }
+
+        function modalAc(id) {
+            aktifModalIstasyonu = id;
+            document.getElementById("modal-istasyon-isim").innerHTML = `<span style="color:#888; font-size:14px; margin-right:5px;">STATION:</span> ${id}`;
+            document.getElementById("istasyon-modal").style.display = "flex";
+            modalGorselleriniGuncelle();
+
+            const cihaz = istasyonlar.find(c => c.id === id);
+            const mTerminal = document.getElementById("modal-terminal");
+            mTerminal.innerHTML = cihaz.logs.join("") || "> No logs available.<br>";
+            mTerminal.scrollTop = mTerminal.scrollHeight;
+        }
+
+        function modalGorselleriniGuncelle() {
+            if (!aktifModalIstasyonu) return;
+            const cihaz = istasyonlar.find(c => c.id === aktifModalIstasyonu);
+
+            const kwGosterge = document.getElementById("modal-kw-deger");
+            const kwhGosterge = document.getElementById("modal-kwh-deger");
+            const yuzdeGosterge = document.getElementById("modal-yuzde-deger");
+
+            const donut = document.getElementById("modal-donut");
+            const araba = document.getElementById("sim-araba");
+            const kablo = document.getElementById("sim-kablo");
+
+            if (cihaz.status === "Charging") {
+                kwGosterge.innerText = cihaz.anlikKw; kwGosterge.style.color = "#00E5FF";
+                kwhGosterge.innerHTML = `${cihaz.harcananKwh} <span>kWh</span>`;
+                yuzdeGosterge.innerText = `%${cihaz.sarjYuzdesi}`;
+
+                donut.style.background = `conic-gradient(var(--charging) ${cihaz.sarjYuzdesi}%, #1A212D ${cihaz.sarjYuzdesi}%)`;
+                araba.classList.add("sarjda");
+                kablo.classList.add("aktif");
+
+            } else if (cihaz.status === "Finishing") {
+                kwGosterge.innerText = "0.0"; kwGosterge.style.color = "#FFF";
+                kwhGosterge.innerHTML = `${cihaz.harcananKwh} <span>kWh</span>`;
+                yuzdeGosterge.innerText = "FULL";
+
+                donut.style.background = `conic-gradient(var(--finishing) 100%, #1A212D 100%)`;
+                araba.classList.remove("sarjda");
+                kablo.classList.remove("aktif");
+            } else {
+                kwGosterge.innerText = "0.0"; kwGosterge.style.color = "#555";
+                kwhGosterge.innerHTML = `0.00 <span>kWh</span>`;
+                yuzdeGosterge.innerText = "--";
+
+                donut.style.background = `conic-gradient(#1A212D 100%, transparent 0)`;
+                araba.classList.remove("sarjda");
+                kablo.classList.remove("aktif");
+            }
+        }
+
+        function modalKapat() { document.getElementById("istasyon-modal").style.display = "none"; aktifModalIstasyonu = null; }
+
+        function manuelDurumAyarla(yeniDurum) {
+            if (!makine || makine.readyState !== WebSocket.OPEN) { alert("Sisteme bağlı değilsiniz!"); return; }
+            const cihaz = istasyonlar.find(c => c.id === aktifModalIstasyonu);
+            if (cihaz) {
+                if (!mantikliGecisMi(cihaz.status, yeniDurum)) { alert(`⛔ Kural İhlali: ${cihaz.status} -> ${yeniDurum} geçişi donanımsal olarak yapılamaz.`); return; }
+                if (yeniDurum === "Charging" && !cihaz.transactionId) { alert("⛔ Güvenlik İhlali: İşlem numarası (TxID) olmadan cihaz şarja sokulamaz."); return; }
+
+                if (cihaz.status === "Charging" && yeniDurum !== "Charging") {
+
+                    if (yeniDurum === "Faulted") {
+                        logYaz(`[ACİL DURUM] Donanım arızası (Fault) algılandı. Şarj anında kesiliyor!`, "#FF1744", cihaz.id);
+                        stopTransactionYolla(cihaz);
+
+                    } else if (yeniDurum === "Unavailable") {
+                        let onay = confirm("⚠️ DİKKAT: Cihaz şu an aktif şarjda! Cihazı bakıma (Unavailable) almak müşterinin şarjını kesecektir. Emin misiniz?");
+                        if (!onay) return;
+                        else {
+                            logYaz(`[SİSTEM UYARISI] Operatör aktif şarjı keserek cihazı bakıma aldı.`, "#FF9800", cihaz.id);
+                            stopTransactionYolla(cihaz);
+                        }
+                    } else if (yeniDurum === "Finishing") {
+                        stopTransactionYolla(cihaz);
+                    }
+                }
+
+                if (yeniDurum !== "Charging") { cihaz.sarjYuzdesi = 0; cihaz.anlikKw = 0.0; cihaz.harcananKwh = 0.00; }
+                cihaz.islemBekliyor = false;
+                durumuSunucuyaYolla(cihaz, yeniDurum);
+            }
+        }
+
+        function manuelIslem(islem) {
+            if (!makine || makine.readyState !== WebSocket.OPEN) return;
+            const cihaz = istasyonlar.find(c => c.id === aktifModalIstasyonu);
+            if (!cihaz) return;
+
+            if (islem === 'AuthGecerli' || islem === 'AuthGecersiz') {
+                if (cihaz.status !== 'Available' && cihaz.status !== 'Preparing') {
+                    alert(`⛔ DONANIM ENGELİ: Cihaz şu an '${cihaz.status}' modunda olduğu için RFID okuyucu deaktif! Kart okutulamaz.`);
+                    logYaz(`[GÜVENLİK ENGELİ] ${cihaz.status} modundaki cihaza yetkisiz kart okutma girişimi!`, "#FF1744", cihaz.id);
+                    return;
+                }
+            }
+
+            if (islem === 'AuthGecerli') authorizeYolla(cihaz, true);
+            else if (islem === 'AuthGecersiz') authorizeYolla(cihaz, false);
+            else if (islem === 'Stop') {
+                if (cihaz.status === 'Charging') stopTransactionYolla(cihaz);
+                else alert("Cihaz şu an Charging durumunda değil!");
+            }
+        }
+    </script>
+</body>
+
+</html>
