@@ -2,7 +2,7 @@
 
 A lightweight, real-time Electric Vehicle Charging (EVC) Station simulator designed to eliminate hardware dependencies for backend testing. Built with a robust State Machine architecture and WebSocket communication.
 
-> **🏢 Corporate Context:** This project was developed as a Proof of Concept (PoC) during a Software Engineering Internship at Vestel's R&D department. The primary goal was to provide a reliable sandbox environment for server-side testing without requiring physical charging station hardware.
+> **🏢 Corporate Context:** This project was developed as a Proof of Concept (PoC) during a Computer Engineering Internship at Vestel's R&D department. The primary goal was to provide a reliable sandbox environment for server-side testing without requiring physical charging station hardware.
 
 ## 🎯 Purpose
 Testing backend operations for a network of 50+ EVC stations requires significant physical hardware, time, and resources. This simulator mimics real hardware behaviors, mechanical delays, and network traffic, dramatically accelerating the backend development and testing phases.
