@@ -79,7 +79,7 @@ public class OcppServer extends WebSocketServer {
     }
 
     public static void main(String[] args) {
-        String host = "localhost";
+        String host = "0.0.0.0";
         int port = 8887;
         WebSocketServer server = new OcppServer(new InetSocketAddress(host, port));
         server.run();
