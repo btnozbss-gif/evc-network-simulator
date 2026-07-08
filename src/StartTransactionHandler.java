@@ -7,7 +7,8 @@ public class StartTransactionHandler implements OcppMessageHandler {
 
     @Override
     public void handle(WebSocket conn, String messageId, JSONObject payload) {
-        String stationId = payload.getString("stationId");
+
+        String stationId = conn.getResourceDescriptor().replace("/", "");
         String idTag = payload.getString("idTag");
         int meterStart = payload.optInt("meterStart", 0);
         System.out.println("\n[TRANSACTION] Station " + stationId + " requested to start a transaction. RFID: " + idTag

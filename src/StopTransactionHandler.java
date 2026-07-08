@@ -6,7 +6,8 @@ public class StopTransactionHandler implements OcppMessageHandler {
 
     @Override
     public void handle(WebSocket conn, String messageId, JSONObject payload) {
-        String stationId = payload.getString("stationId");
+
+        String stationId = conn.getResourceDescriptor().replace("/", "");
         int transactionId = payload.getInt("transactionId");
         int meterStop = payload.optInt("meterStop", 0);
 

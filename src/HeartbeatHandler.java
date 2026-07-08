@@ -7,7 +7,11 @@ public class HeartbeatHandler implements OcppMessageHandler {
 
     @Override
     public void handle(WebSocket conn, String messageId, JSONObject payload) {
-        System.out.println("Station has sent heartbeat!");
+
+        String stationId = conn.getResourceDescriptor().replace("/", "");
+        ChargePoint station = OcppServer.stations.get(stationId);
+
+        System.out.println("Station has sent heartbeat! Station ID: " + stationId);
 
         JSONObject cevapPayload = new JSONObject();
         cevapPayload.put("currentTime", Instant.now().toString());
@@ -16,8 +20,6 @@ public class HeartbeatHandler implements OcppMessageHandler {
         cevapDizisi.put(3);
         cevapDizisi.put(messageId);
         cevapDizisi.put(cevapPayload);
-
-        ChargePoint station = OcppServer.stations.get(payload.getString("stationId"));
 
         if (station != null) {
             station.setLastSeen(Instant.now());

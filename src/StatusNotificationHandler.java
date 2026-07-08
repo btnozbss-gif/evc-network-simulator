@@ -65,7 +65,8 @@ public class StatusNotificationHandler implements OcppMessageHandler {
                     break;
 
             }
-            ChargePoint availableStation = OcppServer.stations.get(payload.getString("stationId"));
+            String stationId = conn.getResourceDescriptor().replace("/", "");
+            ChargePoint availableStation = OcppServer.stations.get(stationId);
             if (availableStation != null) {
                 availableStation.setStatus(enumState);
                 availableStation.setErrorCode(errorState);

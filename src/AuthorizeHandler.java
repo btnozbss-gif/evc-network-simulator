@@ -7,9 +7,10 @@ public class AuthorizeHandler implements OcppMessageHandler {
     @Override
     public void handle(WebSocket conn, String messageId, JSONObject payload) {
 
-        String idTag = payload.getString("idTag");
-        System.out.println("\n-> [AUTHORIZE] Verifying RFID Tag: " + idTag);
+        String stationId = conn.getResourceDescriptor().replace("/", "");
 
+        String idTag = payload.getString("idTag");
+        System.out.println("\n-> [AUTHORIZE] Station ID: " + stationId + " | Verifying RFID Tag: " + idTag);
         JSONObject idTagInfo = new JSONObject();
 
         if (OcppServer.cards.contains(idTag)) {

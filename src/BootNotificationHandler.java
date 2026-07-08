@@ -9,20 +9,28 @@ public class BootNotificationHandler implements OcppMessageHandler {
 
     @Override
     public void handle(WebSocket conn, String messageId, JSONObject payload) {
-        ChargePoint station = new ChargePoint(payload.getString("stationId"), payload.getString("chargePointVendor"),
-                payload.getString("chargePointModel"), ChargePointStatus.AVAILABLE, ChargePointErrorCode.NOERROR,
+
+        String stationId = conn.getResourceDescriptor().replace("/", "");
+
+        ChargePoint station = new ChargePoint(
+                stationId,
+                payload.getString("chargePointVendor"),
+                payload.getString("chargePointModel"),
+                ChargePointStatus.AVAILABLE,
+                ChargePointErrorCode.NOERROR,
                 Instant.now());
 
-        OcppServer.stations.put(payload.getString("stationId"), station);
-        
+        OcppServer.stations.put(stationId, station);
+
         String marka = payload.getString("chargePointVendor");
         String model = payload.getString("chargePointModel");
-        System.out.println("-> [HANDLER] Station is waking up! Brand: " + marka + " | Model: " + model);
+        System.out.println(
+                "-> [HANDLER] Station is waking up! ID: " + stationId + " | Brand: " + marka + " | Model: " + model);
 
         JSONObject cevapPayload = new JSONObject();
         cevapPayload.put("status", "Accepted");
         cevapPayload.put("currentTime", Instant.now().toString());
-        cevapPayload.put("interval", 300);
+        cevapPayload.put("interval", 30);
 
         JSONArray cevapDizisi = new JSONArray();
         cevapDizisi.put(3);
