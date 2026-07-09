@@ -1,5 +1,4 @@
 
-// BootNotificationHandler.java
 import org.java_websocket.WebSocket;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -22,6 +21,12 @@ public class BootNotificationHandler implements OcppMessageHandler {
 
         OcppServer.stations.put(stationId, station);
 
+        JSONObject uiMessage = new JSONObject();
+        uiMessage.put("action", "BootNotification");
+        uiMessage.put("stationId", stationId);
+        uiMessage.put("chargePointVendor", station.getVendor());
+        uiMessage.put("chargePointModel", station.getModel());
+
         String marka = payload.getString("chargePointVendor");
         String model = payload.getString("chargePointModel");
         System.out.println(
@@ -33,10 +38,10 @@ public class BootNotificationHandler implements OcppMessageHandler {
         cevapPayload.put("interval", 30);
 
         JSONArray cevapDizisi = new JSONArray();
-        cevapDizisi.put(3);
+        cevapDizisi.put(OcppConstants.CALL_RESULT);
         cevapDizisi.put(messageId);
         cevapDizisi.put(cevapPayload);
-
+        UiWebSocketServer.broadcastToUi(uiMessage.toString());
         conn.send(cevapDizisi.toString());
         System.out.println("[RESPOND HAS BEEN SENT] " + cevapDizisi.toString());
     }

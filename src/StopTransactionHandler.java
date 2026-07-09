@@ -30,14 +30,21 @@ public class StopTransactionHandler implements OcppMessageHandler {
                     + transactionId + " is force-closed.");
         }
 
+        JSONObject uiMessage = new JSONObject();
+        uiMessage.put("action", "StopTransaction");
+        uiMessage.put("stationId", stationId);
+        uiMessage.put("transactionId", transactionId);
+        uiMessage.put("meterStop", meterStop);
+
         JSONObject cevapPayload = new JSONObject();
         cevapPayload.put("idTagInfo", idTagInfo);
 
         JSONArray cevapDizisi = new JSONArray();
-        cevapDizisi.put(3);
+        cevapDizisi.put(OcppConstants.CALL_RESULT);
         cevapDizisi.put(messageId);
         cevapDizisi.put(cevapPayload);
 
+        UiWebSocketServer.broadcastToUi(uiMessage.toString());
         conn.send(cevapDizisi.toString());
         System.out.println(" [RESPOND HAS BEEN SENT] " + cevapDizisi.toString());
     }

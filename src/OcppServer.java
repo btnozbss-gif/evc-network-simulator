@@ -2,8 +2,8 @@ import org.java_websocket.server.WebSocketServer;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.WebSocket;
 import java.net.InetSocketAddress;
-import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.json.JSONArray;
@@ -12,7 +12,7 @@ import org.json.JSONObject;
 public class OcppServer extends WebSocketServer {
 
     public static final Map<String, ChargePoint> stations = new ConcurrentHashMap<>();
-    public static final HashSet<String> cards = new HashSet<>();
+    public static final Set<String> cards = ConcurrentHashMap.newKeySet();
     public static final Map<Integer, String> activeTransactions = new ConcurrentHashMap<>();
     public static final AtomicInteger transactionIdGenerator = new AtomicInteger(1000);
 
@@ -45,18 +45,20 @@ public class OcppServer extends WebSocketServer {
 
             JSONArray gelenDizi = new JSONArray(message);
 
-            int mesajTipi = gelenDizi.getInt(0);
-            String mesajId = gelenDizi.getString(1);
-            String aksiyon = gelenDizi.getString(2);
-            JSONObject payload = gelenDizi.getJSONObject(3);
+            if (gelenDizi.length() == 4) {
+                int mesajTipi = gelenDizi.getInt(0);
+                String mesajId = gelenDizi.getString(1);
+                String aksiyon = gelenDizi.getString(2);
+                JSONObject payload = gelenDizi.getJSONObject(3);
 
-            if (mesajTipi == 2) {
-                OcppMessageHandler handler = OcppHandlerFactory.getHandler(aksiyon);
+                if (mesajTipi == OcppConstants.CALL) {
+                    OcppMessageHandler handler = OcppHandlerFactory.getHandler(aksiyon);
 
-                if (handler != null) {
-                    handler.handle(conn, mesajId, payload);
-                } else {
-                    System.out.println("[WARNING] Unsupported or not yet implemented action: " + aksiyon);
+                    if (handler != null) {
+                        handler.handle(conn, mesajId, payload);
+                    } else {
+                        System.out.println("[WARNING] Unsupported or not yet implemented action: " + aksiyon);
+                    }
                 }
             }
 
@@ -81,7 +83,10 @@ public class OcppServer extends WebSocketServer {
     public static void main(String[] args) {
         String host = "0.0.0.0";
         int port = 8887;
+        int uiPort = 8888;
         WebSocketServer server = new OcppServer(new InetSocketAddress(host, port));
-        server.run();
+        WebSocketServer uiServer = new UiWebSocketServer(new InetSocketAddress(host, uiPort));
+        server.start();
+        uiServer.start();
     }
 }

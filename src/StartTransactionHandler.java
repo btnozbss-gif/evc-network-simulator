@@ -31,15 +31,23 @@ public class StartTransactionHandler implements OcppMessageHandler {
             idTagInfo.put("status", "Invalid");
         }
 
+        JSONObject uiMessage = new JSONObject();
+        uiMessage.put("action", "StartTransaction");
+        uiMessage.put("stationId", stationId);
+        uiMessage.put("idTag", idTag);
+        uiMessage.put("transactionId", transactionId);
+        uiMessage.put("status", idTagInfo.getString("status"));
+
         JSONObject cevapPayload = new JSONObject();
         cevapPayload.put("idTagInfo", idTagInfo);
         cevapPayload.put("transactionId", transactionId);
 
         JSONArray cevapDizisi = new JSONArray();
-        cevapDizisi.put(3);
+        cevapDizisi.put(OcppConstants.CALL_RESULT);
         cevapDizisi.put(messageId);
         cevapDizisi.put(cevapPayload);
 
+        UiWebSocketServer.broadcastToUi(uiMessage.toString());
         conn.send(cevapDizisi.toString());
         System.out.println("[RESPOND HAS BEEN SENT] " + cevapDizisi.toString());
 

@@ -21,12 +21,21 @@ public class StatusNotificationHandler implements OcppMessageHandler {
         String errorCode = payload.getString("errorCode");
         String status = payload.getString("status");
 
+        String stationId = conn.getResourceDescriptor().replace("/", "");
+        ChargePoint availableStation = OcppServer.stations.get(stationId);
+
+        JSONObject uiMessage = new JSONObject();
+        uiMessage.put("action", "StatusNotification");
+        uiMessage.put("stationId", stationId);
+        uiMessage.put("connectorId", connectorId);
+
         JSONObject cevapPayload = new JSONObject();
 
         JSONArray cevapDizisi = new JSONArray();
-        cevapDizisi.put(3);
+        cevapDizisi.put(OcppConstants.CALL_RESULT);
         cevapDizisi.put(messageId);
         cevapDizisi.put(cevapPayload);
+
         try {
             ChargePointStatus enumState = ChargePointStatus.valueOf(status.toUpperCase(Locale.ENGLISH));
             ChargePointErrorCode errorState = ChargePointErrorCode.valueOf(errorCode.toUpperCase(Locale.ENGLISH));
@@ -44,6 +53,9 @@ public class StatusNotificationHandler implements OcppMessageHandler {
                 case FINISHING:
                     System.out.println("Device completed charging." + connectorId);
                     break;
+                case UNAVAILABLE:
+                    System.out.println("Device unailable to use. " + connectorId);
+                    break;
                 case FAULTED:
                     switch (errorState) {
                         case NOERROR:
@@ -55,6 +67,9 @@ public class StatusNotificationHandler implements OcppMessageHandler {
                         case READERFAILURE:
                             System.out.println("Card reading warning!!!" + connectorId);
                             break;
+                        case GROUNDFAILURE:
+                            System.out.println("Graund failure!!! " + connectorId);
+                            break;
                         default:
                             System.out.println("Unnamed warning!!!" + connectorId);
                             break;
@@ -65,8 +80,9 @@ public class StatusNotificationHandler implements OcppMessageHandler {
                     break;
 
             }
-            String stationId = conn.getResourceDescriptor().replace("/", "");
-            ChargePoint availableStation = OcppServer.stations.get(stationId);
+            uiMessage.put("status", enumState.name());
+            uiMessage.put("errorCode", errorState.name());
+
             if (availableStation != null) {
                 availableStation.setStatus(enumState);
                 availableStation.setErrorCode(errorState);
@@ -74,6 +90,9 @@ public class StatusNotificationHandler implements OcppMessageHandler {
             } else {
                 System.out.println("[WARNING] A device not registered in the system reported a status.");
             }
+
+            UiWebSocketServer.broadcastToUi(uiMessage.toString());
+
         } catch (Exception e) {
             e.printStackTrace();
         }

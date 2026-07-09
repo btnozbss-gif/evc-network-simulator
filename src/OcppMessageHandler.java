@@ -5,4 +5,5 @@ import org.json.JSONObject;
 public interface OcppMessageHandler {
 
     void handle(WebSocket conn, String messageId, JSONObject payload);
+
 }
