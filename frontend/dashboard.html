@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vestel EVC - Gelişmiş Simülasyon Merkezi</title>
+    <style>
+        :root {
+            --vestel-kirmizi: #E30613;
+            --arka-plan: #0B0E14;
+            --panel-arka: #151A23;
+            --metin-renk: #E0E0E0;
+            --border-renk: #2A313C;
+
+            --available: #00E676;
+            --charging: #00E5FF;
+            --preparing: #FFEA00;
+            --finishing: #D500F9;
+            --faulted: #FF1744;
+            --unavailable: #607D8B;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--arka-plan);
+            color: var(--metin-renk);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- LOGİN EKRANI --- */
+        #login-ekrani {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(11, 14, 20, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-kutu {
+            background-color: var(--panel-arka);
+            border-top: 4px solid var(--vestel-kirmizi);
+            border-radius: 12px;
+            padding: 40px;
+            width: 320px;
+            text-align: center;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8);
+        }
+
+        .login-kutu h2 {
+            color: #FFF;
+            margin-top: 0;
+            letter-spacing: 2px;
+            font-weight: 800;
+        }
+
+        .login-kutu p {
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 25px;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 15px;
+            background-color: #0B0E14;
+            border: 1px solid var(--border-renk);
+            color: #FFF;
+            border-radius: 6px;
+            box-sizing: border-box;
+            transition: 0.3s;
+        }
+
+        .login-input:focus {
+            border-color: var(--vestel-kirmizi);
+            outline: none;
+            box-shadow: 0 0 10px rgba(227, 6, 19, 0.3);
+        }
+
+        #login-hata {
+            color: var(--vestel-kirmizi);
+            font-size: 13px;
+            margin-bottom: 15px;
+            display: none;
+            font-weight: bold;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--vestel-kirmizi);
+            color: #FFF;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            letter-spacing: 1px;
+        }
+
+        .login-btn:hover {
+            background-color: #B7050F;
+            transform: translateY(-2px);
+        }
+
+        /* --- YENİ SOL MENÜ (SİDEBAR) --- */
+        #sidebar {
+            width: 260px;
+            background-color: var(--panel-arka);
+            border-right: 1px solid var(--border-renk);
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+            box-shadow: 5px 0 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .marka-kutu {
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-renk);
+            margin-bottom: 20px;
+        }
+
+        .marka-kutu h1 {
+            color: var(--vestel-kirmizi);
+            margin: 0;
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: 2px;
+        }
+
+        .marka-kutu p {
+            font-size: 11px;
+            color: #888;
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .menu-item {
+            padding: 16px 25px;
+            color: #888;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            border-left: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .menu-item:hover {
+            color: #FFF;
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        .menu-item.aktif {
+            color: #FFF;
+            background-color: rgba(227, 6, 19, 0.1);
+            border-left-color: var(--vestel-kirmizi);
+        }
+
+        .alt-kontroller {
+            margin-top: auto;
+            padding: 25px;
+            border-top: 1px solid var(--border-renk);
+        }
+
+        button {
+            background-color: var(--border-renk);
+            color: white;
+            border: 1px solid transparent;
+            padding: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+            letter-spacing: 1px;
+            width: 100%;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: #2c3545;
+        }
+
+        button:disabled {
+            background-color: #0B0E14;
+            color: #555;
+            cursor: not-allowed;
+            border-color: #111;
+        }
+
+        #btn-baglan {
+            background-color: #005A9E;
+        }
+
+        #btn-baglan:hover:not(:disabled) {
+            background-color: #0078D4;
+        }
+
+        #btn-cikis {
+            background-color: transparent;
+            border: 1px solid var(--vestel-kirmizi);
+            color: var(--vestel-kirmizi);
+            margin-bottom: 0;
+        }
+
+        #btn-cikis:hover {
+            background-color: rgba(227, 6, 19, 0.1);
+        }
+
+        /* --- ANA İÇERİK VE SPA SAYFALARI --- */
+        #ana-icerik {
+            flex-grow: 1;
+            position: relative;
+            background-image: radial-gradient(circle, #1a212d 1px, transparent 1px);
+            background-size: 40px 40px;
+            overflow-y: auto;
+        }
+
+        .sayfa {
+            display: none;
+            padding: 40px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .sayfa.aktif {
+            display: block;
+        }
+
+        .sayfa-baslik {
+            font-size: 22px;
+            color: #FFF;
+            margin-top: 0;
+            margin-bottom: 30px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--border-renk);
+            padding-bottom: 15px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- İSTATİSTİK VE KART MODÜLLERİ --- */
+        .istatistik-kapsayici {
+            background-color: #0B0E14;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid var(--border-renk);
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            max-width: 500px;
+        }
+
+        .stat-baslik {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            font-weight: bold;
+            color: #888;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .stat-satir {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .stat-isim {
+            width: 90px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #bbb;
+        }
+
+        .stat-bar-arkaplan {
+            flex-grow: 1;
+            height: 8px;
+            background-color: #1A212D;
+            border-radius: 4px;
+            margin: 0 15px;
+            overflow: hidden;
+        }
+
+        .stat-bar {
+            height: 100%;
+            width: 0%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .stat-deger {
+            width: 30px;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: right;
+            font-family: monospace;
+        }
+
+        .bg-available {
+            background-color: var(--available);
+            box-shadow: 0 0 8px var(--available);
+        }
+
+        .bg-preparing {
+            background-color: var(--preparing);
+            box-shadow: 0 0 8px var(--preparing);
+        }
+
+        .bg-charging {
+            background-color: var(--charging);
+            box-shadow: 0 0 8px var(--charging);
+        }
+
+        .bg-finishing {
+            background-color: var(--finishing);
+            box-shadow: 0 0 8px var(--finishing);
+        }
+
+        .bg-faulted {
+            background-color: var(--faulted);
+            box-shadow: 0 0 8px var(--faulted);
+        }
+
+        .bg-unavailable {
+            background-color: var(--unavailable);
+            box-shadow: 0 0 8px var(--unavailable);
+        }
+
+        /* --- İSTASYON GRID VE KUTULAR --- */
+        #grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 25px;
+        }
+
+        .cihaz-kutu {
+            background-color: var(--panel-arka);
+            border: 1px solid var(--border-renk);
+            border-radius: 12px;
+            padding: 25px 15px;
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .cihaz-kutu::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            transition: all 0.3s;
+        }
+
+        .cihaz-kutu:hover {
+            transform: translateY(-7px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.6);
+            background-color: #1C2331;
+        }
+
+        .cihaz-id {
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #FFF;
+            letter-spacing: 1px;
+        }
+
+        .cihaz-durum {
+            font-size: 10px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            display: inline-block;
+            background-color: #0B0E14;
+            border: 1px solid transparent;
+        }
+
+        .st-available::before {
+            background-color: var(--available);
+        }
+
+        .st-available .cihaz-durum {
+            color: var(--available);
+            border-color: rgba(0, 230, 118, 0.3);
+        }
+
+        .st-preparing::before {
+            background-color: var(--preparing);
+        }
+
+        .st-preparing .cihaz-durum {
+            color: var(--preparing);
+            border-color: rgba(255, 234, 0, 0.3);
+        }
+
+        .st-charging::before {
+            background-color: var(--charging);
+            box-shadow: 0 0 15px var(--charging);
+        }
+
+        .st-charging .cihaz-durum {
+            background-color: rgba(0, 229, 255, 0.1);
+            color: var(--charging);
+            border-color: var(--charging);
+        }
+
+        .st-finishing::before {
+            background-color: var(--finishing);
+        }
+
+        .st-finishing .cihaz-durum {
+            color: var(--finishing);
+            border-color: rgba(213, 0, 249, 0.3);
+        }
+
+        .st-faulted::before {
+            background-color: var(--faulted);
+        }
+
+        .st-faulted .cihaz-durum {
+            color: var(--faulted);
+            border-color: rgba(255, 23, 68, 0.3);
+        }
+
+        .st-unavailable::before {
+            background-color: var(--unavailable);
+        }
+
+        .st-unavailable .cihaz-durum {
+            color: var(--unavailable);
+            border-color: rgba(96, 125, 139, 0.3);
+        }
+
+        /* --- TERMİNAL LOGLARI --- */
+        #terminal {
+            background-color: #05070A;
+            border: 1px solid var(--border-renk);
+            border-radius: 12px;
+            padding: 20px;
+            height: 60vh;
+            overflow-y: auto;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            color: #999;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* MODAL KISMI (Değişmedi, eski hali korundu) */
+        .modal-arkaplan {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-icerik {
+            background-color: var(--panel-arka);
+            border: 1px solid var(--border-renk);
+            border-radius: 16px;
+            width: 700px;
+            padding: 0;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        .modal-baslik {
+            background-color: #0B0E14;
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-renk);
+        }
+
+        .modal-baslik h2 {
+            margin: 0;
+            color: #FFF;
+            font-size: 18px;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-baslik h2::before {
+            content: "";
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background-color: var(--charging);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--charging);
+        }
+
+        .victron-ekran {
+            background: radial-gradient(circle at top, #1C2433 0%, #0B0E14 100%);
+            padding: 30px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-renk);
+            position: relative;
+        }
+
+        /* --- YENİ AĞ TOPOLOJİSİ (SİBER EKRAN) --- */
+        .topology-kapsayici {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .network-svg {
+            width: 100%;
+            max-width: 550px;
+            height: 100px;
+            overflow: visible;
+        }
+
+        .node-bg {
+            fill: #0B0E14;
+            stroke: var(--border-renk);
+            stroke-width: 2;
+            rx: 8;
+            transition: 0.3s;
+        }
+
+        .node-icon {
+            fill: none;
+            stroke: #666;
+            stroke-width: 2;
+            transition: 0.3s;
+            stroke-linejoin: round;
+            stroke-linecap: round;
+        }
+
+        .node-text {
+            fill: #666;
+            font-size: 11px;
+            font-weight: bold;
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+
+        .kablo {
+            fill: none;
+            stroke: #1A212D;
+            stroke-width: 4;
+            stroke-linecap: round;
+        }
+
+        .kablo-akis {
+            fill: none;
+            stroke-width: 3;
+            stroke-dasharray: 8, 8;
+            opacity: 0;
+            stroke-linecap: round;
+            transition: opacity 0.3s;
+        }
+
+        /* Enerji Akışı (İstasyon -> Araba) */
+        .enerji-akis {
+            stroke: var(--charging);
+            animation: dashFlow 1s linear infinite reverse;
+            filter: drop-shadow(0 0 6px var(--charging));
+        }
+
+        #sim-topology.sarjda .kablo-enerji-akis {
+            opacity: 1;
+        }
+
+        #sim-topology.sarjda .car-icon,
+        #sim-topology.sarjda .station-icon {
+            stroke: var(--charging);
+            filter: drop-shadow(0 0 5px var(--charging));
+        }
+
+        #sim-topology.sarjda .car-bg {
+            stroke: var(--charging);
+        }
+
+        /* Data Akışı (Sunucu <-> İstasyon) */
+        .data-akis {
+            stroke: var(--available);
+            animation: dashFlow 0.5s linear infinite;
+            filter: drop-shadow(0 0 6px var(--available));
+        }
+
+        #sim-topology.data-aktif .kablo-data-akis {
+            opacity: 1;
+        }
+
+        #sim-topology.data-aktif .server-icon,
+        #sim-topology.data-aktif .station-icon {
+            stroke: var(--available);
+            filter: drop-shadow(0 0 5px var(--available));
+        }
+
+        #sim-topology.data-aktif .server-bg {
+            stroke: var(--available);
+        }
+
+        @keyframes dashFlow {
+            to {
+                stroke-dashoffset: 32;
+            }
+        }
+
+        .gorsel-simulasyon-alani {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding: 0 20px;
+        }
+
+        .araba-alani {
+            position: relative;
+            width: 280px;
+            height: 130px;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .araba-svg {
+            width: 100%;
+            opacity: 0.3;
+            transition: all 0.5s ease;
+            filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.5));
+        }
+
+        .araba-svg.sarjda {
+            opacity: 1;
+            filter: drop-shadow(0 10px 20px rgba(0, 229, 255, 0.4));
+        }
+
+        .araba-svg #port-isik {
+            transition: all 0.5s;
+            fill: #444;
+        }
+
+        .araba-svg.sarjda #port-isik {
+            fill: var(--charging);
+            filter: drop-shadow(0 0 5px var(--charging));
+        }
+
+        .sarj-kablosu {
+            position: absolute;
+            right: -5px;
+            bottom: 35px;
+            width: 50px;
+            height: 4px;
+            background-color: #1A212D;
+            transform-origin: left;
+            transform: rotate(-5deg);
+            transition: all 0.5s ease;
+            opacity: 0;
+        }
+
+        .sarj-kablosu.aktif {
+            background-color: var(--charging);
+            box-shadow: 0 0 12px var(--charging);
+            opacity: 1;
+        }
+
+        .donut-container {
+            width: 170px;
+            height: 170px;
+            border-radius: 50%;
+            background: conic-gradient(#1A212D 100%, transparent 0);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            transition: background 0.4s;
+        }
+
+        .donut-inner {
+            width: 145px;
+            height: 145px;
+            background-color: #0B0E14;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: inset 0 5px 15px rgba(0, 0, 0, 0.8);
+            z-index: 2;
+        }
+
+        .v-power-deger {
+            font-size: 48px;
+            font-weight: 300;
+            color: #FFF;
+            line-height: 1;
+        }
+
+        .v-power-birim {
+            font-size: 16px;
+            color: #888;
+            font-weight: bold;
+            margin-left: 2px;
+        }
+
+        .v-yuzde-deger {
+            font-size: 16px;
+            color: #888;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .v-detay-grid {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+        }
+
+        .v-detay-kutu {
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 15px 25px;
+            border-radius: 8px;
+            text-align: left;
+            min-width: 130px;
+        }
+
+        .v-detay-kutu p {
+            margin: 0 0 5px 0;
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .v-detay-kutu h4 {
+            margin: 0;
+            font-size: 20px;
+            color: #00E5FF;
+            font-weight: 600;
+            display: flex;
+            align-items: baseline;
+            gap: 5px;
+        }
+
+        .v-detay-kutu h4 span {
+            font-size: 12px;
+            color: #888;
+            font-weight: normal;
+        }
+
+        .kontrol-baslik {
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 20px 25px 10px 25px;
+            font-weight: bold;
+        }
+
+        #modal-terminal {
+            background-color: #05070A;
+            border: 1px solid var(--border-renk);
+            height: 120px;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 0 25px 25px 25px;
+            overflow-y: auto;
+            font-family: 'Consolas', monospace;
+            font-size: 11px;
+            color: #888;
+        }
+
+        .kapat-btn {
+            background: none;
+            color: #888;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+            transition: 0.3s;
+            width: auto;
+        }
+
+        .kapat-btn:hover {
+            background-color: transparent;
+            color: #FFF;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="login-ekrani">
+        <div class="login-kutu">
+            <h2>VESTEL EVC</h2>
+            <p>CSMS Yönetim Paneli</p>
+            <input type="text" id="kullanici-adi" class="login-input" placeholder="Kullanıcı Adı" autocomplete="off">
+            <input type="password" id="sifre" class="login-input" placeholder="Şifre">
+            <div id="login-hata">Yetkisiz Erişim! Lütfen tekrar deneyin.</div>
+            <button class="login-btn" onclick="girisYap()">SİSTEME GİRİŞ YAP</button>
+        </div>
+    </div>
+
+    <div id="sidebar">
+        <div class="marka-kutu">
+            <h1>VESTEL EVC</h1>
+            <p>Cloud Platform</p>
+        </div>
+
+        <div class="menu-item aktif" onclick="sayfaDegistir('dashboard', this)">
+            <span>📊</span> Dashboard
+        </div>
+        <div class="menu-item" onclick="sayfaDegistir('istasyonlar', this)">
+            <span>⚡</span> İstasyonlar & Ağ
+        </div>
+        <div class="menu-item" onclick="sayfaDegistir('rfid', this)">
+            <span>💳</span> RFID Kart Yönetimi
+        </div>
+        <div class="menu-item" onclick="sayfaDegistir('loglar', this)">
+            <span>📝</span> Sistem Logları
+        </div>
+
+        <div class="alt-kontroller">
+            <button id="btn-baglan" onclick="sunucuyaBaglan()">🔌 Sunucuya Bağlan</button>
+            <button id="btn-cikis" onclick="cikisYap()">🚪 ÇIKIŞ YAP</button>
+        </div>
+    </div>
+
+    <div id="ana-icerik">
+
+        <div id="sayfa-dashboard" class="sayfa aktif">
+            <h2 class="sayfa-baslik">Ağ Özeti ve İstatistikler</h2>
+            <div class="istatistik-kapsayici" id="istatistik-panel">
+                <div class="stat-baslik">
+                    <span>Filo Durumu</span>
+                    <span>Toplam: <span id="stat-toplam">0</span> İstasyon</span>
+                </div>
+                <div class="stat-satir"><span class="stat-isim">AVAILABLE</span>
+                    <div class="stat-bar-arkaplan">
+                        <div class="stat-bar bg-available" id="bar-available" style="width: 0%;"></div>
+                    </div><span class="stat-deger" id="stat-available">0</span>
+                </div>
+                <div class="stat-satir"><span class="stat-isim">PREPARING</span>
+                    <div class="stat-bar-arkaplan">
+                        <div class="stat-bar bg-preparing" id="bar-preparing"></div>
+                    </div><span class="stat-deger" id="stat-preparing">0</span>
+                </div>
+                <div class="stat-satir"><span class="stat-isim">CHARGING</span>
+                    <div class="stat-bar-arkaplan">
+                        <div class="stat-bar bg-charging" id="bar-charging"></div>
+                    </div><span class="stat-deger" id="stat-charging">0</span>
+                </div>
+                <div class="stat-satir"><span class="stat-isim">FINISHING</span>
+                    <div class="stat-bar-arkaplan">
+                        <div class="stat-bar bg-finishing" id="bar-finishing"></div>
+                    </div><span class="stat-deger" id="stat-finishing">0</span>
+                </div>
+                <div class="stat-satir"><span class="stat-isim">FAULTED</span>
+                    <div class="stat-bar-arkaplan">
+                        <div class="stat-bar bg-faulted" id="bar-faulted"></div>
+                    </div><span class="stat-deger" id="stat-faulted">0</span>
+                </div>
+                <div class="stat-satir"><span class="stat-isim">UNAVAILABLE</span>
+                    <div class="stat-bar-arkaplan">
+                        <div class="stat-bar bg-unavailable" id="bar-unavailable"></div>
+                    </div><span class="stat-deger" id="stat-unavailable">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="sayfa-istasyonlar" class="sayfa">
+            <h2 class="sayfa-baslik">Canlı İstasyon Yönetimi</h2>
+            <div id="grid-container"></div>
+        </div>
+
+        <div id="sayfa-rfid" class="sayfa">
+            <h2 class="sayfa-baslik">Güvenlik ve Yetkilendirme</h2>
+            <div class="istatistik-kapsayici" id="rfid-panel">
+                <div class="stat-baslik"><span>💳 RFID Kart Ekle / Sil</span></div>
+                <div style="display: flex; gap: 5px; margin-bottom: 20px;">
+                    <input type="text" id="yeni-kart-input" placeholder="Kart ID (örn: 04B0A3)" class="login-input"
+                        style="margin-bottom: 0; padding: 12px; font-size: 13px;" autocomplete="off">
+                    <button onclick="kartEkleArayuz()"
+                        style="margin-bottom: 0; padding: 10px 20px; width: auto; background-color: var(--available); color: #0B0E14; border: none;">EKLE</button>
+                </div>
+                <div id="kart-listesi-container" style="max-height: 300px; overflow-y: auto; padding-right: 5px;">
+                    <div style='color: #888; font-size: 12px; text-align: center; margin-top: 10px;'>Bağlantı
+                        bekleniyor...</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="sayfa-loglar" class="sayfa">
+            <h2 class="sayfa-baslik">OCPP İletişim Trafiği</h2>
+            <div id="terminal">
+                > Sistem başlatılıyor...<br>
+                > Giriş bekleniyor.<br>
+            </div>
+        </div>
+
+    </div>
+    <div id="istasyon-modal" class="modal-arkaplan">
+        <div class="modal-icerik">
+            <div class="modal-baslik">
+                <h2 id="modal-istasyon-isim">VESTEL_01 EV CHARGER</h2>
+                <button class="kapat-btn" onclick="modalKapat()">&times;</button>
+            </div>
+            <div class="victron-ekran">
+                <div class="topology-kapsayici" id="sim-topology">
+                    <svg class="network-svg" viewBox="0 0 500 100">
+                        <path class="kablo" d="M 120 40 L 250 40" />
+                        <path class="kablo" d="M 250 40 L 380 40" />
+
+                        <path class="kablo-akis data-akis kablo-data-akis" d="M 120 40 L 250 40" />
+
+                        <path class="kablo-akis enerji-akis kablo-enerji-akis" d="M 250 40 L 380 40" />
+
+                        <g transform="translate(60, 15)">
+                            <rect class="node-bg server-bg" width="60" height="50" x="0" y="0" />
+                            <path class="node-icon server-icon"
+                                d="M 15 25 Q 15 15 25 15 Q 30 5 40 15 Q 50 15 45 25 M 15 25 Q 5 25 10 35 L 50 35 Q 55 25 45 25" />
+                            <text class="node-text" x="30" y="70" text-anchor="middle">CSMS (8888)</text>
+                        </g>
+
+                        <g transform="translate(220, 15)">
+                            <rect class="node-bg station-bg" width="60" height="50" x="0" y="0" />
+                            <path class="node-icon station-icon" d="M 25 10 h 10 v 30 h -10 z M 20 40 h 20" />
+                            <text class="node-text" x="30" y="70" text-anchor="middle">VESTEL EVC04</text>
+                        </g>
+
+                        <g transform="translate(380, 15)">
+                            <rect class="node-bg car-bg" width="60" height="50" x="0" y="0" />
+                            <path class="node-icon car-icon"
+                                d="M 10 30 L 20 15 H 40 L 50 30 V 40 H 10 Z M 15 40 A 4 4 0 0 0 23 40 M 37 40 A 4 4 0 0 0 45 40" />
+                            <text class="node-text" x="30" y="70" text-anchor="middle">ELECTRIC VEHICLE</text>
+                        </g>
+                    </svg>
+                </div>
+
+                <div style="display: flex; justify-content: center; align-items: center; gap: 50px;">
+                    <div class="donut-container" id="modal-donut">
+                        <div class="donut-inner">
+                            <div style="display:flex; align-items:baseline;">
+                                <span class="v-power-deger" id="modal-kw-deger">0.0</span>
+                                <span class="v-power-birim">kW</span>
+                            </div>
+                            <div class="v-yuzde-deger" id="modal-yuzde-deger">%0</div>
+                        </div>
+                    </div>
+                    <div class="v-detay-grid" style="flex-direction: column; gap: 15px;">
+                        <div class="v-detay-kutu">
+                            <p>Total Energy</p>
+                            <h4 id="modal-kwh-deger">0.00 <span>kWh</span></h4>
+                        </div>
+                        <div class="v-detay-kutu">
+                            <p>Connector</p>
+                            <h4 style="color:#FFF;">Type 2 <span>AC</span></h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-kontroller">
+                <p class="kontrol-baslik">Uzaktan Komutlar (Remote Operations)</p>
+                <div class="modal-buton-grup">
+                    <button onclick="uzaktanKomutGonder('RemoteStartTransaction')"
+                        style="border-left: 3px solid var(--available);">ŞARJ BAŞLAT</button>
+                    <button onclick="uzaktanKomutGonder('RemoteStopTransaction')"
+                        style="border-left: 3px solid var(--finishing);">ŞARJ DURDUR</button>
+                    <button onclick="uzaktanKomutGonder('UnlockConnector')"
+                        style="border-left: 3px solid var(--charging);">KİLİDİ AÇ</button>
+                    <button onclick="uzaktanKomutGonder('SoftReset')"
+                        style="border-left: 3px solid var(--preparing);">SOFT RESET</button>
+                    <button onclick="uzaktanKomutGonder('HardReset')"
+                        style="border-left: 3px solid var(--faulted);">HARD RESET</button>
+                </div>
+
+                <p class="kontrol-baslik">İstasyon İletişim Logları (OCPP)</p>
+                <div id="modal-terminal"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // SPA (Single Page Application) Sayfa Değiştirici
+        function sayfaDegistir(sayfaId, tiklananButon) {
+            // 1. Tüm sayfaları gizle
+            document.querySelectorAll('.sayfa').forEach(sayfa => {
+                sayfa.classList.remove('aktif');
+            });
+            // 2. İstenen sayfayı göster
+            document.getElementById('sayfa-' + sayfaId).classList.add('aktif');
+
+            // 3. Menüdeki aktiflik rengini (kırmızı çizgiyi) değiştir
+            document.querySelectorAll('.menu-item').forEach(buton => {
+                buton.classList.remove('aktif');
+            });
+            tiklananButon.classList.add('aktif');
+        }
+        // ==========================================
+        // SİSTEM DEĞİŞKENLERİ
+        // ==========================================
+        let makine;
+        const istasyonlar = [];
+        let aktifModalIstasyonu = null;
+
+        const terminal = document.getElementById("terminal");
+        const grid = document.getElementById("grid-container");
+
+        // ==========================================
+        // OTURUM VE GİRİŞ İŞLEMLERİ
+        // ==========================================
+        window.onload = function () {
+            if (sessionStorage.getItem("oturum_gecerli") === "evet") {
+                document.getElementById("login-ekrani").style.display = "none";
+                sistemiHazirla();
+            }
+        };
+
+        document.getElementById("sifre").addEventListener("keypress", function (event) {
+            if (event.key === "Enter") girisYap();
+        });
+
+        function girisYap() {
+            const kulAdi = document.getElementById("kullanici-adi").value;
+            const sfr = document.getElementById("sifre").value;
+            if (kulAdi === "admin" && sfr === "vestel123") {
+                document.getElementById("login-ekrani").style.display = "none";
+                sessionStorage.setItem("oturum_gecerli", "evet");
+                logYaz("Sistem yöneticisi (admin) başarıyla doğrulandı.", "#00E676");
+                sistemiHazirla();
+            } else {
+                document.getElementById("login-hata").style.display = "block";
+            }
+        }
+
+        function cikisYap() {
+            sessionStorage.removeItem("oturum_gecerli");
+            document.getElementById("login-ekrani").style.display = "flex";
+            document.getElementById("sifre").value = "";
+            document.getElementById("login-hata").style.display = "none";
+            if (makine && makine.readyState === WebSocket.OPEN) {
+                makine.close();
+            }
+            logYaz("Sistemden çıkış yapıldı. Oturum kilitlendi.", "#FF9800");
+        }
+
+        // ==========================================
+        // CSMS BAŞLATMA VE ARAYÜZ SIFIRLAMA
+        // ==========================================
+        function sistemiHazirla() {
+            grid.innerHTML = "";
+            istasyonlar.length = 0;
+            istatistikleriHesapla();
+            logYaz("CSMS Paneli hazır. Fiziksel cihazlardan bağlantı bekleniyor...", "#00E5FF");
+
+            // Simülasyon butonlarını devre dışı bırakıyoruz, gerçek cihazla çalışacağız.
+            document.getElementById("btn-baglan").disabled = false;
+        }
+
+        function logYaz(mesaj, renk = "#aaa", istasyonId = null) {
+            const saat = new Date().toLocaleTimeString();
+            const logSatiri = `<span style="color: #444;">[${saat}]</span> <span style="color: ${renk};">${mesaj}</span><br>`;
+
+            terminal.insertAdjacentHTML('beforeend', logSatiri);
+
+            if (terminal.childElementCount > 300) {
+                terminal.removeChild(terminal.firstChild);
+                terminal.removeChild(terminal.firstChild);
+            }
+            terminal.scrollTop = terminal.scrollHeight;
+
+            if (istasyonId) {
+                const cihaz = istasyonlar.find(c => c.id === istasyonId);
+                if (cihaz) {
+                    cihaz.logs.push(logSatiri);
+                    if (aktifModalIstasyonu === istasyonId) {
+                        const mTerminal = document.getElementById("modal-terminal");
+                        mTerminal.insertAdjacentHTML('beforeend', logSatiri);
+                        mTerminal.scrollTop = mTerminal.scrollHeight;
+                    }
+                }
+            }
+        }
+
+        // ==========================================
+        // WEBSOCKET KÖPRÜSÜ (JAVA İLE HABERLEŞME)
+        // ==========================================
+        function sunucuyaBaglan() {
+            logYaz("UI Sunucusuna (Port 8888) bağlanılıyor...", "#FF9800");
+            makine = new WebSocket("ws://localhost:8888");
+
+            makine.onopen = function () {
+                logYaz("Bağlantı Başarılı! Java sunucusu dinleniyor.", "#00E676");
+                document.getElementById("btn-baglan").disabled = true;
+                document.getElementById("btn-baglan").innerText = "BAĞLI (PORT: 8888)";
+                document.getElementById("btn-baglan").style.backgroundColor = "#00E676";
+            };
+
+            makine.onmessage = function (event) {
+                // Java sunucusundan (UiWebSocketServer) gelen JSON'u okuyoruz
+                const data = JSON.parse(event.data);
+                const stationId = data.stationId;
+                dataAkisiTetikle(stationId);
+
+                // 1. BootNotification: Yeni cihaz ağa katıldığında kutuyu oluştur
+                if (data.action === "BootNotification") {
+                    logYaz(`[BOOT] Yeni cihaz katıldı: ${stationId} (${data.chargePointVendor})`, "#00E5FF", stationId);
+                    cihazKutusuOlustur(stationId);
+                }
+
+                // 2. StatusNotification: Cihazın rengini ve durumunu değiştir
+                else if (data.action === "StatusNotification") {
+                    let logMesaji = `[STATUS] ${stationId} durumu: ${data.status}`;
+                    if (data.errorCode && data.errorCode !== "NOERROR") {
+                        logMesaji += ` (Hata: ${data.errorCode})`;
+                        logYaz(logMesaji, "#FF1744", stationId);
+                    } else {
+                        logYaz(logMesaji, "#ccc", stationId);
+                    }
+                    arayuzuGuncelle(stationId, data.status);
+                }
+
+                // 3. Heartbeat: Kalp atışı
+                else if (data.action === "Heartbeat") {
+                    logYaz(`[HEARTBEAT] ${stationId} çevrimiçi.`, "#666", stationId);
+                }
+
+                // 4. Authorize: Kart okutma sonucu
+                else if (data.action === "Authorize") {
+                    const renk = data.status === "Accepted" ? "#00E676" : "#FF1744";
+                    logYaz(`[AUTHORIZE] RFID: ${data.idTag} | Sonuç: ${data.status}`, renk, stationId);
+                }
+
+                // 5. StartTransaction: Şarj fiilen başladı
+                else if (data.action === "StartTransaction") {
+                    logYaz(`[TRANSACTION] Başladı! (ID: ${data.transactionId})`, "#00E5FF", stationId);
+                    const cihaz = istasyonlar.find(c => c.id === stationId);
+                    if (cihaz) {
+                        cihaz.transactionId = data.transactionId;
+                        cihaz.sarjYuzdesi = 0; // Şimdilik 0, ileride MeterValues ile dolacak
+                    }
+                }
+
+                // 6. StopTransaction: Şarj fiilen bitti
+                else if (data.action === "StopTransaction") {
+                    logYaz(`[TRANSACTION] Bitti! Toplam Tüketim: ${data.meterStop} Wh`, "#D500F9", stationId);
+                    const cihaz = istasyonlar.find(c => c.id === stationId);
+                    if (cihaz) {
+                        cihaz.transactionId = null;
+                        cihaz.harcananKwh = (data.meterStop / 1000).toFixed(2);
+                    }
+                    modalGorselleriniGuncelle();
+                }
+                else if (data.action === "UpdateCardList") {
+                    logYaz(`[SİSTEM] Java'dan güncel kart listesi alındı: ${data.cards.length} adet kart.`, "#FFEA00");
+                    window.guncelKartlar = data.cards;
+                    kartListesiniCiz(data.cards);
+                }
+                // 8. MeterValues: Cihazdan anlık tüketim verisi geldiğinde
+                else if (data.action === "MeterValues") {
+                    const cihaz = istasyonlar.find(c => c.id === stationId);
+
+                    if (cihaz && cihaz.status === "CHARGING") {
+                        // Java'dan gelen Wh (Watt-saat) değerini kWh'a çeviriyoruz
+                        const harcananKwh = (parseFloat(data.meterValue) / 1000).toFixed(2);
+                        cihaz.harcananKwh = harcananKwh;
+
+                        // --- GÖRSEL ANİMASYON HİLELERİ ---
+                        // AC şarj cihazları (EVC04 gibi) arabanın batarya yüzdesini bilemez.
+                        // Bu yüzden Donut grafiğinin görsel olarak dolması için yüzdayi ufak ufak biz artırıyoruz.
+                        if (cihaz.sarjYuzdesi < 100) {
+                            cihaz.sarjYuzdesi += 1;
+                        }
+
+                        // Anlık çekilen gücü (kW) dinamik bir görüntü vermek için sahte dalgalandırıyoruz
+                        cihaz.anlikKw = (21.5 + Math.random()).toFixed(1);
+
+                        // Sadece her 5% artışta veya belli aralıklarla log basalım ki terminal boğulmasın
+                        if (cihaz.sarjYuzdesi % 5 === 0) {
+                            logYaz(`[SAYAÇ] ${stationId}: ${harcananKwh} kWh enerji transfer edildi.`, "#00E5FF", stationId);
+                        }
+
+                        // Eğer o an bu cihazın detay (modal) ekranı açıksa, görselleri CANLI güncelle!
+                        if (aktifModalIstasyonu === stationId) {
+                            modalGorselleriniGuncelle();
+                        }
+                    }
+                }
+            };
+
+            makine.onclose = function () {
+                logYaz("Java sunucusu ile bağlantı koptu!", "#FF1744");
+                document.getElementById("btn-baglan").disabled = false;
+                document.getElementById("btn-baglan").innerText = "🔌 Sunucuya Bağlan";
+                document.getElementById("btn-baglan").style.backgroundColor = "#005A9E";
+            };
+        }
+        // ==========================================
+        // KART YÖNETİM KOMUTLARI (JAVA'YA GİDENLER)
+        // ==========================================
+        function kartEkleKomutuGonder(yeniKartId) {
+            if (!makine || makine.readyState !== WebSocket.OPEN) {
+                alert("Hata: Sunucuya bağlı değilsiniz!");
+                return;
+            }
+            const paket = { action: "AddCard", idTag: yeniKartId };
+            makine.send(JSON.stringify(paket));
+            logYaz(`[KOMUT] Java'ya kart ekleme isteği gönderildi: ${yeniKartId}`, "#ccc");
+        }
+
+        function kartSilKomutuGonder(silinecekKartId) {
+            if (!makine || makine.readyState !== WebSocket.OPEN) return;
+            const paket = { action: "RemoveCard", idTag: silinecekKartId };
+            makine.send(JSON.stringify(paket));
+            logYaz(`[KOMUT] Java'ya kart silme isteği gönderildi: ${silinecekKartId}`, "#ccc");
+        }
+        // ==========================================
+        // UZAKTAN KOMUT (REMOTE OPERATIONS) YÖNETİMİ
+        // ==========================================
+        function uzaktanKomutGonder(komutAdi) {
+            if (!makine || makine.readyState !== WebSocket.OPEN) {
+                alert("Hata: Sunucuya bağlı değilsiniz!");
+                return;
+            }
+            if (!aktifModalIstasyonu) return;
+
+            // Yanlışlıkla basılmasını önlemek için operatörden onay alıyoruz
+            const onay = confirm(`DİKKAT: ${aktifModalIstasyonu} cihazına '${komutAdi}' komutu gönderilecek. Onaylıyor musunuz?`);
+            if (!onay) return;
+
+            // Java sunucusuna fırlatılacak komut paketi
+            const cihaz = istasyonlar.find(c => c.id === aktifModalIstasyonu);
+            const paket = {
+                action: "RemoteCommand",
+                stationId: aktifModalIstasyonu,
+                command: komutAdi,
+                transactionId: cihaz ? cihaz.transactionId : null
+            };
+
+            makine.send(JSON.stringify(paket));
+            logYaz(`[KOMUT] Merkezden cihaza ${komutAdi} isteği gönderildi.`, "#FF9800", aktifModalIstasyonu);
+        }
+
+        // ==========================================
+        // EKRAN ÇİZİM VE GÜNCELLEME FONKSİYONLARI
+        // ==========================================
+        function cihazKutusuOlustur(id) {
+            if (istasyonlar.find(c => c.id === id)) return; // Zaten varsa tekrar çizme
+
+            // Cihazın dijital ikizini hafızada oluştur
+            istasyonlar.push({
+                id: id,
+                status: "AVAILABLE",
+                transactionId: null,
+                sarjYuzdesi: 0,
+                anlikKw: 0.0,
+                harcananKwh: 0.00,
+                logs: []
+            });
+
+            let kutu = document.createElement("div");
+            kutu.className = "cihaz-kutu st-available";
+            kutu.id = "kutu-" + id;
+            kutu.onclick = () => modalAc(id);
+            kutu.innerHTML = `<div class="cihaz-id">${id}</div><div class="cihaz-durum" id="durum-${id}">AVAILABLE</div>`;
+            grid.appendChild(kutu);
+
+            istatistikleriHesapla();
+        }
+
+        function arayuzuGuncelle(id, durum) {
+            const cihaz = istasyonlar.find(c => c.id === id);
+            if (!cihaz) return;
+
+            cihaz.status = durum.toUpperCase();
+            const kutu = document.getElementById("kutu-" + id);
+            const durumMetni = document.getElementById("durum-" + id);
+
+            kutu.className = "cihaz-kutu st-" + durum.toLowerCase();
+            durumMetni.innerText = cihaz.status;
+
+            istatistikleriHesapla();
+            if (aktifModalIstasyonu === id) modalGorselleriniGuncelle();
+        }
+
+        function istatistikleriHesapla() {
+            const toplam = istasyonlar.length;
+            document.getElementById("stat-toplam").innerText = toplam;
+
+            if (toplam === 0) return;
+
+            const arr = istasyonlar.map(c => c.status);
+            const counts = {
+                Available: arr.filter(s => s === "AVAILABLE").length,
+                Preparing: arr.filter(s => s === "PREPARING").length,
+                Charging: arr.filter(s => s === "CHARGING").length,
+                Finishing: arr.filter(s => s === "FINISHING").length,
+                Faulted: arr.filter(s => s === "FAULTED").length,
+                Unavailable: arr.filter(s => s === "UNAVAILABLE").length
+            };
+
+            for (const [durum, sayi] of Object.entries(counts)) {
+                document.getElementById(`stat-${durum.toLowerCase()}`).innerText = sayi;
+                document.getElementById(`bar-${durum.toLowerCase()}`).style.width = `${(sayi / toplam) * 100}%`;
+            }
+        }
+
+        // ==========================================
+        // MODAL (VİCTRQN DETAY EKRANI) YÖNETİMİ
+        // ==========================================
+        function modalAc(id) {
+            aktifModalIstasyonu = id;
+            document.getElementById("modal-istasyon-isim").innerHTML = `<span style="color:#888; font-size:14px; margin-right:5px;">STATION:</span> ${id}`;
+            document.getElementById("istasyon-modal").style.display = "flex";
+            modalGorselleriniGuncelle();
+
+            const cihaz = istasyonlar.find(c => c.id === id);
+            const mTerminal = document.getElementById("modal-terminal");
+            mTerminal.innerHTML = cihaz.logs.join("") || "> Log kaydı bulunmuyor.<br>";
+            mTerminal.scrollTop = mTerminal.scrollHeight;
+        }
+
+        function modalKapat() {
+            document.getElementById("istasyon-modal").style.display = "none";
+            aktifModalIstasyonu = null;
+        }
+
+        function modalGorselleriniGuncelle() {
+            if (!aktifModalIstasyonu) return;
+            const cihaz = istasyonlar.find(c => c.id === aktifModalIstasyonu);
+            if (!cihaz) return;
+
+            const kwGosterge = document.getElementById("modal-kw-deger");
+            const kwhGosterge = document.getElementById("modal-kwh-deger");
+            const yuzdeGosterge = document.getElementById("modal-yuzde-deger");
+            const donut = document.getElementById("modal-donut");
+
+            // SADECE YENİ TOPOLOJİYİ ALIYORUZ (Eski araba/kablo tanımlarını sildik)
+            const topology = document.getElementById("sim-topology");
+
+            if (cihaz.status === "CHARGING") {
+                kwGosterge.innerText = cihaz.anlikKw || "0.0";
+                kwGosterge.style.color = "#00E5FF";
+                kwhGosterge.innerHTML = `${cihaz.harcananKwh || "0.00"} <span>kWh</span>`;
+                yuzdeGosterge.innerText = `%${cihaz.sarjYuzdesi || 0}`;
+
+                donut.style.background = `conic-gradient(var(--charging) ${cihaz.sarjYuzdesi || 0}%, #1A212D ${cihaz.sarjYuzdesi || 0}%)`;
+
+                // TOPOLOJİDE ŞARJI BAŞLAT (Mavi Işınları Ateşle)
+                topology.classList.add("sarjda");
+
+            } else if (cihaz.status === "FINISHING") {
+                kwGosterge.innerText = "0.0";
+                kwGosterge.style.color = "#FFF";
+                kwhGosterge.innerHTML = `${cihaz.harcananKwh || "0.00"} <span>kWh</span>`;
+                yuzdeGosterge.innerText = "FULL";
+
+                donut.style.background = `conic-gradient(var(--finishing) 100%, #1A212D 100%)`;
+
+                // MAVİ IŞINLARI KAPAT
+                topology.classList.remove("sarjda");
+
+            } else {
+                kwGosterge.innerText = "0.0";
+                kwGosterge.style.color = "#555";
+                kwhGosterge.innerHTML = `0.00 <span>kWh</span>`;
+                yuzdeGosterge.innerText = "--";
+
+                donut.style.background = `conic-gradient(#1A212D 100%, transparent 0)`;
+
+                // MAVİ IŞINLARI KAPAT
+                topology.classList.remove("sarjda");
+            }
+        }
+        // ==========================================
+        // KART YÖNETİMİ ARAYÜZ (UI) ÇİZİM FONKSİYONLARI
+        // ==========================================
+
+        // Input kutusundan veriyi alıp Java'ya fırlatan aracı fonksiyon
+        function kartEkleArayuz() {
+            const input = document.getElementById("yeni-kart-input");
+            const deger = input.value.trim().toUpperCase(); // Boşlukları sil ve harfleri büyüt
+
+            if (deger !== "") {
+                kartEkleKomutuGonder(deger);
+                input.value = ""; // Butona basınca kutuyu temizle
+            } else {
+                alert("Lütfen geçerli bir Kart ID girin.");
+            }
+        }
+
+        // Java'dan gelen [ "KART1", "KART2" ] dizisini ekrana çizen fonksiyon
+        function kartListesiniCiz(kartlar) {
+            const container = document.getElementById("kart-listesi-container");
+            container.innerHTML = ""; // Eski listeyi temizle
+
+            if (!kartlar || kartlar.length === 0) {
+                container.innerHTML = "<div style='color: #888; font-size: 11px; text-align: center; margin-top: 10px;'>Sistemde kayıtlı yetkili kart yok.</div>";
+                return;
+            }
+
+            // Dizideki her bir kart için şık bir satır oluştur
+            kartlar.forEach(kartId => {
+                const satir = document.createElement("div");
+                satir.style.display = "flex";
+                satir.style.justifyContent = "space-between";
+                satir.style.alignItems = "center";
+                satir.style.backgroundColor = "#1A212D";
+                satir.style.padding = "8px 12px";
+                satir.style.marginBottom = "6px";
+                satir.style.borderRadius = "6px";
+                satir.style.border = "1px solid var(--border-renk)";
+
+                // Satırın içine Kart ID'sini ve SİL butonunu yerleştir
+                satir.innerHTML = `
+                    <span style="font-family: 'Consolas', monospace; color: #FFF; font-size: 12px; font-weight: bold; letter-spacing: 1px;">${kartId}</span>
+                    <button onclick="kartSilKomutuGonder('${kartId}')" style="margin: 0; padding: 4px 10px; background-color: transparent; border: 1px solid var(--faulted); color: var(--faulted); font-size: 10px;">SİL</button>
+                `;
+
+                container.appendChild(satir);
+            });
+        }
+        // Her OCPP mesajında bulut ile istasyon arasındaki veri kablosunu parlatır
+        function dataAkisiTetikle(id) {
+            if (aktifModalIstasyonu === id) {
+                const topology = document.getElementById("sim-topology");
+                topology.classList.add("data-aktif");
+                setTimeout(() => {
+                    topology.classList.remove("data-aktif");
+                }, 800); // 0.8 saniye sonra ışığı söndür
+            }
+        }
+    </script>
+</body>
+
+</html>

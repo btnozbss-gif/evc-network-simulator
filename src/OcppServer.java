@@ -15,11 +15,13 @@ public class OcppServer extends WebSocketServer {
     public static final Set<String> cards = ConcurrentHashMap.newKeySet();
     public static final Map<Integer, String> activeTransactions = new ConcurrentHashMap<>();
     public static final AtomicInteger transactionIdGenerator = new AtomicInteger(1000);
+    public static final Map<String, WebSocket> activeConnections = new ConcurrentHashMap<>();
 
     static {
         cards.add("VESTEL_CARD_01");
         cards.add("VESTEL_CARD_02");
         cards.add("A1B2C3D4");
+        cards.add("ADMIN_REMOTE");
         System.out.println("[BOOT] " + cards.size() + " authorized RFID cards have been loaded into the system.");
     }
 
@@ -29,11 +31,15 @@ public class OcppServer extends WebSocketServer {
 
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
+        String stationId = conn.getResourceDescriptor().replace("/", "");
+        activeConnections.put(stationId, conn);
         System.out.println("\n[CONNECTION] New charge station connected: " + conn.getRemoteSocketAddress());
     }
 
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
+        String stationId = conn.getResourceDescriptor().replace("/", "");
+        activeConnections.remove(stationId, conn);
         System.out.println("\n[DISCONNECTED] Station connection lost: " + conn.getRemoteSocketAddress());
     }
 
@@ -78,6 +84,18 @@ public class OcppServer extends WebSocketServer {
     public void onStart() {
         System.out.println("Vestel EVC Lite Server Started...");
         System.out.println("Charging stations are waiting. (Port: " + getPort() + ")\n");
+    }
+
+    public static void addCard(String newTag) {
+        cards.add(newTag);
+    }
+
+    public static void removeCard(String cardTag) {
+        if (!cards.isEmpty()) {
+            cards.remove(cardTag);
+        } else {
+            System.out.println("There is no card to remove!");
+        }
     }
 
     public static void main(String[] args) {

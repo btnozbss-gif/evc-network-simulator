@@ -1,5 +1,4 @@
 
-// OcppHandlerFactory.java
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,6 +14,7 @@ public class OcppHandlerFactory {
         handlers.put("Authorize", new AuthorizeHandler());
         handlers.put("StartTransaction", new StartTransactionHandler());
         handlers.put("StopTransaction", new StopTransactionHandler());
+        handlers.put("MeterValues", new MeterValuesHandler());
 
     }
 

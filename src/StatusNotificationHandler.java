@@ -6,7 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 enum ChargePointStatus {
-    AVAILABLE, PREPARING, CHARGING, FINISHING, FAULTED, UNAVAILABLE
+    AVAILABLE, PREPARING, CHARGING, SUSPENDEDEV, SUSPENDEDEVSE, FINISHING, FAULTED, UNAVAILABLE
 }
 
 enum ChargePointErrorCode {
@@ -55,6 +55,12 @@ public class StatusNotificationHandler implements OcppMessageHandler {
                     break;
                 case UNAVAILABLE:
                     System.out.println("Device unailable to use. " + connectorId);
+                    break;
+                case SUSPENDEDEV:
+                    System.out.println("Charging suspended by EV (Car paused). " + connectorId);
+                    break;
+                case SUSPENDEDEVSE:
+                    System.out.println("Charging suspended by EVSE (Station paused). " + connectorId);
                     break;
                 case FAULTED:
                     switch (errorState) {
