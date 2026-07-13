@@ -10,18 +10,17 @@ enum ChargePointStatus {
 }
 
 enum ChargePointErrorCode {
-    NOERROR, HIGHTEMPERATURE, READERFAILURE, GROUNDFAILURE
+    NOERROR, HIGHTEMPERATURE, READERFAILURE, GROUNDFAILURE, OTHERERROR, OVERCURRENTFAILURE, UNDERVOLTAGE, OVERVOLTAGE
 }
 
 public class StatusNotificationHandler implements OcppMessageHandler {
 
     @Override
-    public void handle(WebSocket conn, String messageId, JSONObject payload) {
+    public void handle(WebSocket conn, String messageId, JSONObject payload, String stationId) {
         int connectorId = payload.getInt("connectorId");
         String errorCode = payload.getString("errorCode");
         String status = payload.getString("status");
 
-        String stationId = conn.getResourceDescriptor().replace("/", "");
         ChargePoint availableStation = OcppServer.stations.get(stationId);
 
         JSONObject uiMessage = new JSONObject();
@@ -65,19 +64,29 @@ public class StatusNotificationHandler implements OcppMessageHandler {
                 case FAULTED:
                     switch (errorState) {
                         case NOERROR:
-                            System.out.println("There is no error in system!!!" + connectorId);
                             break;
-                        case HIGHTEMPERATURE:
-                            System.out.println("High temperature warning!!!" + connectorId);
+                        case OTHERERROR:
+                            System.out.println(
+                                    "[⚠️ ERROR LOG] Station reported 'OtherError' (Check Proximity Pilot / Cable connection).");
                             break;
-                        case READERFAILURE:
-                            System.out.println("Card reading warning!!!" + connectorId);
-                            break;
+
                         case GROUNDFAILURE:
-                            System.out.println("Graund failure!!! " + connectorId);
+                            System.out.println("[🚨 CRITICAL] Ground failure detected on station!");
+                            break;
+
+                        case OVERCURRENTFAILURE:
+                            System.out.println("[🚨 CRITICAL] Overcurrent failure detected!");
+                            break;
+
+                        case UNDERVOLTAGE:
+                            System.out.println("[⚠️ WARNING] Undervoltage detected on grid line.");
+                            break;
+
+                        case OVERVOLTAGE:
+                            System.out.println("[⚠️ WARNING] Overvoltage detected on grid line.");
                             break;
                         default:
-                            System.out.println("Unnamed warning!!!" + connectorId);
+                            System.out.println("Undefined Error!");
                             break;
                     }
                     break;

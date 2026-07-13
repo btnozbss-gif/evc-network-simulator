@@ -82,6 +82,8 @@ public class UiWebSocketServer extends WebSocketServer {
                     String cmd = payload.optString("command");
                     int txId = payload.optInt("transactionId", 0);
 
+                    String uiKarti = payload.optString("idTag", "ADMIN_REMOTE");
+
                     System.out.println(
                             "\n-> [UI COMMAND] Sending " + cmd + " command to station " + targetStation + "...");
 
@@ -93,7 +95,7 @@ public class UiWebSocketServer extends WebSocketServer {
                     JSONObject cmdPayload = new JSONObject();
                     if (cmd.equals("RemoteStartTransaction")) {
                         ocppPaketi.put("RemoteStartTransaction");
-                        cmdPayload.put("idTag", "ADMIN_REMOTE");
+                        cmdPayload.put("idTag", uiKarti);
                     } else if (cmd.equals("RemoteStopTransaction")) {
                         ocppPaketi.put("RemoteStopTransaction");
                         cmdPayload.put("transactionId", txId);

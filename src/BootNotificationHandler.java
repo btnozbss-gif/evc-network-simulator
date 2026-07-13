@@ -7,9 +7,7 @@ import java.time.Instant;
 public class BootNotificationHandler implements OcppMessageHandler {
 
     @Override
-    public void handle(WebSocket conn, String messageId, JSONObject payload) {
-
-        String stationId = conn.getResourceDescriptor().replace("/", "");
+    public void handle(WebSocket conn, String messageId, JSONObject payload, String stationId) {
 
         ChargePoint station = new ChargePoint(
                 stationId,
@@ -33,7 +31,7 @@ public class BootNotificationHandler implements OcppMessageHandler {
                 "-> [HANDLER] Station is waking up! ID: " + stationId + " | Brand: " + marka + " | Model: " + model);
 
         JSONObject cevapPayload = new JSONObject();
-        cevapPayload.put("status", "Accepted");
+        cevapPayload.put("status", OcppConstants.STATUS_ACCEPTED);
         cevapPayload.put("currentTime", Instant.now().toString());
         cevapPayload.put("interval", 30);
 

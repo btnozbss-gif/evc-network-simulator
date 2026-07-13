@@ -5,16 +5,21 @@ import org.json.JSONObject;
 public class MeterValuesHandler implements OcppMessageHandler {
 
     @Override
-    public void handle(WebSocket conn, String messageId, JSONObject payload) {
+    public void handle(WebSocket conn, String messageId, JSONObject payload, String stationId) {
 
-        String stationId = conn.getResourceDescriptor().replace("/", "");
         int transactionId = payload.getInt("transactionId");
 
-        String meterString = payload.getJSONArray("meterValue")
-                .getJSONObject(0)
-                .getJSONArray("sampledValue")
-                .getJSONObject(0)
-                .getString("value");
+        String meterString = "0";
+
+        JSONArray meterValueArray = payload.optJSONArray("meterValue");
+        if (meterValueArray != null && meterValueArray.length() > 0) {
+
+            JSONArray sampledValueArray = meterValueArray.getJSONObject(0).optJSONArray("sampledValue");
+            if (sampledValueArray != null && sampledValueArray.length() > 0) {
+
+                meterString = sampledValueArray.getJSONObject(0).optString("value", "0");
+            }
+        }
 
         System.out.println("-> [METER] Station: " + stationId + " | Energy: " + meterString + " Wh");
 

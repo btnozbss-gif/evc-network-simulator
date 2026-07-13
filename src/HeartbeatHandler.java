@@ -6,9 +6,8 @@ import java.time.Instant;
 public class HeartbeatHandler implements OcppMessageHandler {
 
     @Override
-    public void handle(WebSocket conn, String messageId, JSONObject payload) {
+    public void handle(WebSocket conn, String messageId, JSONObject payload, String stationId) {
 
-        String stationId = conn.getResourceDescriptor().replace("/", "");
         ChargePoint station = OcppServer.stations.get(stationId);
 
         System.out.println("Station has sent heartbeat! Station ID: " + stationId);

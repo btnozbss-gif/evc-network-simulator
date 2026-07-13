@@ -6,9 +6,8 @@ import org.json.JSONObject;
 public class StartTransactionHandler implements OcppMessageHandler {
 
     @Override
-    public void handle(WebSocket conn, String messageId, JSONObject payload) {
+    public void handle(WebSocket conn, String messageId, JSONObject payload, String stationId) {
 
-        String stationId = conn.getResourceDescriptor().replace("/", "");
         String idTag = payload.getString("idTag");
         int meterStart = payload.optInt("meterStart", 0);
         System.out.println("\n[TRANSACTION] Station " + stationId + " requested to start a transaction. RFID: " + idTag
@@ -20,7 +19,7 @@ public class StartTransactionHandler implements OcppMessageHandler {
         ChargePoint station = OcppServer.stations.get(stationId);
 
         if (station != null && OcppServer.cards.contains(idTag)) {
-            idTagInfo.put("status", "Accepted");
+            idTagInfo.put("status", OcppConstants.STATUS_ACCEPTED);
             transactionId = OcppServer.transactionIdGenerator.incrementAndGet();
             OcppServer.activeTransactions.put(transactionId, stationId);
             station.setStatus(ChargePointStatus.CHARGING);
@@ -28,7 +27,7 @@ public class StartTransactionHandler implements OcppMessageHandler {
                     + transactionId + ")");
         } else {
             System.out.println("-> [RESULT] Authorization REJECTED! Invalid or unregistered RFID card.");
-            idTagInfo.put("status", "Invalid");
+            idTagInfo.put("status", OcppConstants.STATUS_INVALID);
         }
 
         JSONObject uiMessage = new JSONObject();

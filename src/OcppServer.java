@@ -61,9 +61,11 @@ public class OcppServer extends WebSocketServer {
                     OcppMessageHandler handler = OcppHandlerFactory.getHandler(aksiyon);
 
                     if (handler != null) {
-                        handler.handle(conn, mesajId, payload);
+                        String stationId = conn.getResourceDescriptor().replace("/", "");
+
+                        handler.handle(conn, mesajId, payload, stationId);
                     } else {
-                        System.out.println("[WARNING] Unsupported or not yet implemented action: " + aksiyon);
+                        System.out.println("[WARNING] Unsupported action: " + aksiyon);
                     }
                 }
             }

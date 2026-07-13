@@ -5,9 +5,8 @@ import org.json.JSONObject;
 public class StopTransactionHandler implements OcppMessageHandler {
 
     @Override
-    public void handle(WebSocket conn, String messageId, JSONObject payload) {
+    public void handle(WebSocket conn, String messageId, JSONObject payload, String stationId) {
 
-        String stationId = conn.getResourceDescriptor().replace("/", "");
         int transactionId = payload.getInt("transactionId");
         int meterStop = payload.optInt("meterStop", 0);
 
@@ -18,7 +17,7 @@ public class StopTransactionHandler implements OcppMessageHandler {
         ChargePoint station = OcppServer.stations.get(stationId);
 
         JSONObject idTagInfo = new JSONObject();
-        idTagInfo.put("status", "Accepted");
+        idTagInfo.put("status", OcppConstants.STATUS_ACCEPTED);
 
         if (station != null) {
             station.setStatus(ChargePointStatus.FINISHING);

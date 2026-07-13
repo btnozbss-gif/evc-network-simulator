@@ -476,21 +476,6 @@
             box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
         }
 
-        /* MODAL KISMI (Değişmedi, eski hali korundu) */
-        .modal-arkaplan {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(5px);
-            z-index: 100;
-            justify-content: center;
-            align-items: center;
-        }
-
         .modal-icerik {
             background-color: var(--panel-arka);
             border: 1px solid var(--border-renk);
@@ -817,6 +802,7 @@
             margin: 0;
             transition: 0.3s;
             width: auto;
+            line-height: 1;
         }
 
         .kapat-btn:hover {
@@ -824,7 +810,106 @@
             color: #FFF;
             transform: scale(1.1);
         }
+
+        /* KÜÇÜK EKRANLAR İÇİN DÜZENLEME */
+        @media (max-width: 768px) {
+            .v-detay-grid {
+                flex-direction: column !important;
+                gap: 15px;
+            }
+
+            .modal-buton-grup {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .modal-buton-grup button {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+
+        /* --- YENİ EKLENEN TEMİZLİK SINIFLARI --- */
+        .log-saat {
+            color: #444;
+            font-family: 'Consolas', monospace;
+        }
+
+        .kart-satir {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #1A212D;
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            border-radius: 6px;
+            border: 1px solid var(--border-renk);
+        }
+
+        .kart-id-metin {
+            font-family: 'Consolas', monospace;
+            color: #FFF;
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .kart-sil-btn {
+            margin: 0;
+            padding: 4px 10px;
+            background-color: transparent;
+            border: 1px solid var(--faulted);
+            color: var(--faulted);
+            font-size: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .kart-sil-btn:hover {
+            background-color: rgba(255, 23, 68, 0.1);
+        }
+
+        .bos-liste-uyari {
+            color: #888;
+            font-size: 11px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .ac-info-badge {
+            font-size: 10px;
+            color: #FFEA00;
+            background-color: rgba(255, 234, 0, 0.1);
+            border: 1px solid rgba(255, 234, 0, 0.3);
+            padding: 4px 8px;
+            border-radius: 12px;
+            margin-top: 10px;
+            cursor: help;
+            letter-spacing: 1px;
+        }
+
+        /* --- CANLI GRAFİK ALANI CSS --- */
+        .grafik-kapsayici {
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 25px;
+            height: 180px;
+            position: relative;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Küçük ekranlarda grafiğin taşmasını engellemek için */
+        @media (max-width: 768px) {
+            .grafik-kapsayici {
+                height: 150px;
+            }
+        }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -982,7 +1067,10 @@
                                 <span class="v-power-deger" id="modal-kw-deger">0.0</span>
                                 <span class="v-power-birim">kW</span>
                             </div>
-                            <div class="v-yuzde-deger" id="modal-yuzde-deger">%0</div>
+                            <div class="ac-info-badge"
+                                title="AC Şarj mimarisi (Type 2) gereği araçtan SoC (Batarya Yüzdesi) verisi alınamamaktadır.">
+                                ⚠️ AC MODE
+                            </div>
                         </div>
                     </div>
                     <div class="v-detay-grid" style="flex-direction: column; gap: 15px;">
@@ -992,31 +1080,36 @@
                         </div>
                         <div class="v-detay-kutu">
                             <p>Connector</p>
-                            <h4 style="color:#FFF;">Type 2 <span>AC</span></h4>
+                            <h4 style="color:#FFF;">Type 2 <span>AC 22kW</span></h4>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <div class="modal-kontroller">
-                <p class="kontrol-baslik">Uzaktan Komutlar (Remote Operations)</p>
-                <div class="modal-buton-grup">
-                    <button onclick="uzaktanKomutGonder('RemoteStartTransaction')"
-                        style="border-left: 3px solid var(--available);">ŞARJ BAŞLAT</button>
-                    <button onclick="uzaktanKomutGonder('RemoteStopTransaction')"
-                        style="border-left: 3px solid var(--finishing);">ŞARJ DURDUR</button>
-                    <button onclick="uzaktanKomutGonder('UnlockConnector')"
-                        style="border-left: 3px solid var(--charging);">KİLİDİ AÇ</button>
-                    <button onclick="uzaktanKomutGonder('SoftReset')"
-                        style="border-left: 3px solid var(--preparing);">SOFT RESET</button>
-                    <button onclick="uzaktanKomutGonder('HardReset')"
-                        style="border-left: 3px solid var(--faulted);">HARD RESET</button>
+                <div class="grafik-kapsayici">
+                    <canvas id="sarj-grafigi"></canvas>
                 </div>
-
-                <p class="kontrol-baslik">İstasyon İletişim Logları (OCPP)</p>
-                <div id="modal-terminal"></div>
             </div>
         </div>
+    </div>
+
+    <div class="modal-kontroller">
+        <p class="kontrol-baslik">Uzaktan Komutlar (Remote Operations)</p>
+        <div class="modal-buton-grup">
+            <button onclick="uzaktanKomutGonder('RemoteStartTransaction')"
+                style="border-left: 3px solid var(--available);">ŞARJ BAŞLAT</button>
+            <button onclick="uzaktanKomutGonder('RemoteStopTransaction')"
+                style="border-left: 3px solid var(--finishing);">ŞARJ DURDUR</button>
+            <button onclick="uzaktanKomutGonder('UnlockConnector')"
+                style="border-left: 3px solid var(--charging);">KİLİDİ AÇ</button>
+            <button onclick="uzaktanKomutGonder('SoftReset')" style="border-left: 3px solid var(--preparing);">SOFT
+                RESET</button>
+            <button onclick="uzaktanKomutGonder('HardReset')" style="border-left: 3px solid var(--faulted);">HARD
+                RESET</button>
+        </div>
+
+        <p class="kontrol-baslik">İstasyon İletişim Logları (OCPP)</p>
+        <div id="modal-terminal"></div>
+    </div>
+    </div>
     </div>
 
     <script>
@@ -1041,6 +1134,7 @@
         let makine;
         const istasyonlar = [];
         let aktifModalIstasyonu = null;
+        let aktifGrafik = null;
 
         const terminal = document.getElementById("terminal");
         const grid = document.getElementById("grid-container");
@@ -1098,7 +1192,8 @@
 
         function logYaz(mesaj, renk = "#aaa", istasyonId = null) {
             const saat = new Date().toLocaleTimeString();
-            const logSatiri = `<span style="color: #444;">[${saat}]</span> <span style="color: ${renk};">${mesaj}</span><br>`;
+            // Satıriçi stiller yerine CSS class'ı ve dinamik renk ataması kullanıldı
+            const logSatiri = `<span class="log-saat">[${saat}]</span> <span style="color: ${renk};">${mesaj}</span><br>`;
 
             terminal.insertAdjacentHTML('beforeend', logSatiri);
 
@@ -1204,18 +1299,13 @@
                         const harcananKwh = (parseFloat(data.meterValue) / 1000).toFixed(2);
                         cihaz.harcananKwh = harcananKwh;
 
-                        // --- GÖRSEL ANİMASYON HİLELERİ ---
-                        // AC şarj cihazları (EVC04 gibi) arabanın batarya yüzdesini bilemez.
-                        // Bu yüzden Donut grafiğinin görsel olarak dolması için yüzdayi ufak ufak biz artırıyoruz.
-                        if (cihaz.sarjYuzdesi < 100) {
-                            cihaz.sarjYuzdesi += 1;
-                        }
-
                         // Anlık çekilen gücü (kW) dinamik bir görüntü vermek için sahte dalgalandırıyoruz
                         cihaz.anlikKw = (21.5 + Math.random()).toFixed(1);
+                        if (aktifModalIstasyonu === stationId) { grafigeVeriEkle(cihaz.anlikKw); }
 
-                        // Sadece her 5% artışta veya belli aralıklarla log basalım ki terminal boğulmasın
-                        if (cihaz.sarjYuzdesi % 5 === 0) {
+                        // Eski if (cihaz.sarjYuzdesi % 5 === 0) kısmını silip yerine bunu yapıştır:
+                        cihaz.meterCount = (cihaz.meterCount || 0) + 1;
+                        if (cihaz.meterCount % 5 === 0) {
                             logYaz(`[SAYAÇ] ${stationId}: ${harcananKwh} kWh enerji transfer edildi.`, "#00E5FF", stationId);
                         }
 
@@ -1263,21 +1353,30 @@
             }
             if (!aktifModalIstasyonu) return;
 
-            // Yanlışlıkla basılmasını önlemek için operatörden onay alıyoruz
-            const onay = confirm(`DİKKAT: ${aktifModalIstasyonu} cihazına '${komutAdi}' komutu gönderilecek. Onaylıyor musunuz?`);
-            if (!onay) return;
+            let idTagGonderilecek = null;
+
+            // Şarj Başlat komutu ise, hafızaya aldığımız o GÜNCEL kartı gönder
+            if (komutAdi === "RemoteStartTransaction") {
+                idTagGonderilecek = aktifUzaktanKart;
+            } else {
+                // Şarj Durdur, Reset gibi komutlar için operatörden onay al
+                const onay = confirm(`DİKKAT: ${aktifModalIstasyonu} cihazına '${komutAdi}' komutu gönderilecek. Onaylıyor musunuz?`);
+                if (!onay) return;
+            }
+
+            const cihaz = istasyonlar.find(c => c.id === aktifModalIstasyonu);
 
             // Java sunucusuna fırlatılacak komut paketi
-            const cihaz = istasyonlar.find(c => c.id === aktifModalIstasyonu);
             const paket = {
                 action: "RemoteCommand",
                 stationId: aktifModalIstasyonu,
                 command: komutAdi,
-                transactionId: cihaz ? cihaz.transactionId : null
+                transactionId: cihaz ? cihaz.transactionId : null,
+                idTag: idTagGonderilecek
             };
 
             makine.send(JSON.stringify(paket));
-            logYaz(`[KOMUT] Merkezden cihaza ${komutAdi} isteği gönderildi.`, "#FF9800", aktifModalIstasyonu);
+            logYaz(`[KOMUT] Merkezden cihaza ${komutAdi} isteği gönderildi. (Kart: ${idTagGonderilecek || "Yok"})`, "#FF9800", aktifModalIstasyonu);
         }
 
         // ==========================================
@@ -1343,11 +1442,69 @@
                 document.getElementById(`bar-${durum.toLowerCase()}`).style.width = `${(sayi / toplam) * 100}%`;
             }
         }
+        // Grafiği başlatan/sıfırlayan fonksiyon
+        function grafikBaslatVeyaSifirla() {
+            const ctx = document.getElementById('sarj-grafigi').getContext('2d');
+            if (aktifGrafik) { aktifGrafik.destroy(); } // Eski grafik varsa temizle
+
+            aktifGrafik = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Anlık Güç (kW)',
+                        data: [],
+                        borderColor: '#00E5FF',
+                        backgroundColor: 'rgba(0, 229, 255, 0.1)',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        pointHitRadius: 10,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#888', font: { size: 10, family: 'monospace' } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#888', font: { size: 10, family: 'monospace' } },
+                            min: 0,
+                            max: 25 // 22kW AC cihaz olduğu için max 25 yeterli
+                        }
+                    },
+                    animation: { duration: 400 }
+                }
+            });
+        }
+
+        // Yeni veri geldiğinde grafiğe ekleyen fonksiyon
+        function grafigeVeriEkle(kwDegeri) {
+            if (!aktifGrafik) return;
+            const simdi = new Date();
+            const saat = simdi.toLocaleTimeString('tr-TR', { hour12: false });
+
+            aktifGrafik.data.labels.push(saat);
+            aktifGrafik.data.datasets[0].data.push(kwDegeri);
+
+            if (aktifGrafik.data.labels.length > 20) {
+                aktifGrafik.data.labels.shift();
+                aktifGrafik.data.datasets[0].data.shift();
+            }
+            aktifGrafik.update();
+        }
 
         // ==========================================
         // MODAL (VİCTRQN DETAY EKRANI) YÖNETİMİ
         // ==========================================
         function modalAc(id) {
+            grafikBaslatVeyaSifirla();
             aktifModalIstasyonu = id;
             document.getElementById("modal-istasyon-isim").innerHTML = `<span style="color:#888; font-size:14px; margin-right:5px;">STATION:</span> ${id}`;
             document.getElementById("istasyon-modal").style.display = "flex";
@@ -1371,43 +1528,32 @@
 
             const kwGosterge = document.getElementById("modal-kw-deger");
             const kwhGosterge = document.getElementById("modal-kwh-deger");
-            const yuzdeGosterge = document.getElementById("modal-yuzde-deger");
             const donut = document.getElementById("modal-donut");
-
-            // SADECE YENİ TOPOLOJİYİ ALIYORUZ (Eski araba/kablo tanımlarını sildik)
             const topology = document.getElementById("sim-topology");
 
             if (cihaz.status === "CHARGING") {
                 kwGosterge.innerText = cihaz.anlikKw || "0.0";
                 kwGosterge.style.color = "#00E5FF";
                 kwhGosterge.innerHTML = `${cihaz.harcananKwh || "0.00"} <span>kWh</span>`;
-                yuzdeGosterge.innerText = `%${cihaz.sarjYuzdesi || 0}`;
 
-                donut.style.background = `conic-gradient(var(--charging) ${cihaz.sarjYuzdesi || 0}%, #1A212D ${cihaz.sarjYuzdesi || 0}%)`;
-
-                // TOPOLOJİDE ŞARJI BAŞLAT (Mavi Işınları Ateşle)
+                const gucOrani = Math.min((parseFloat(cihaz.anlikKw) / 22) * 100, 100) || 0;
+                donut.style.background = `conic-gradient(var(--charging) ${gucOrani}%, #1A212D ${gucOrani}%)`;
                 topology.classList.add("sarjda");
 
             } else if (cihaz.status === "FINISHING") {
                 kwGosterge.innerText = "0.0";
                 kwGosterge.style.color = "#FFF";
                 kwhGosterge.innerHTML = `${cihaz.harcananKwh || "0.00"} <span>kWh</span>`;
-                yuzdeGosterge.innerText = "FULL";
 
                 donut.style.background = `conic-gradient(var(--finishing) 100%, #1A212D 100%)`;
-
-                // MAVİ IŞINLARI KAPAT
                 topology.classList.remove("sarjda");
 
             } else {
                 kwGosterge.innerText = "0.0";
                 kwGosterge.style.color = "#555";
                 kwhGosterge.innerHTML = `0.00 <span>kWh</span>`;
-                yuzdeGosterge.innerText = "--";
 
                 donut.style.background = `conic-gradient(#1A212D 100%, transparent 0)`;
-
-                // MAVİ IŞINLARI KAPAT
                 topology.classList.remove("sarjda");
             }
         }
@@ -1416,13 +1562,26 @@
         // ==========================================
 
         // Input kutusundan veriyi alıp Java'ya fırlatan aracı fonksiyon
+        // Uzaktan başlatmada kullanılacak "Master" kartı hafızada tutan değişken
+        let aktifUzaktanKart = "ADMIN_REMOTE";
+
+        // Kart Ekle butonuna basıldığında çalışacak fonksiyon
         function kartEkleArayuz() {
             const input = document.getElementById("yeni-kart-input");
-            const deger = input.value.trim().toUpperCase(); // Boşlukları sil ve harfleri büyüt
+            const kartId = input.value.trim().toUpperCase();
 
-            if (deger !== "") {
-                kartEkleKomutuGonder(deger);
-                input.value = ""; // Butona basınca kutuyu temizle
+            if (kartId !== "") {
+                // 1. Kartı sunucuya (Java'ya) gönder
+                const paket = { action: "AddCard", idTag: kartId };
+                makine.send(JSON.stringify(paket));
+
+                // 2. SİHİRLİ DOKUNUŞ: Bu kartı artık uzaktan şarj için varsayılan yap!
+                aktifUzaktanKart = kartId;
+
+                // 3. Ekrana bilgi ver ve kutuyu temizle
+                logYaz(`[UI COMMAND] Added Card: ${kartId}`);
+                input.value = "";
+                alert(`Kart başarıyla eklendi! Artık uzaktan şarj başlatıldığında otomatik olarak [${kartId}] kullanılacak.`);
             } else {
                 alert("Lütfen geçerli bir Kart ID girin.");
             }
@@ -1434,27 +1593,19 @@
             container.innerHTML = ""; // Eski listeyi temizle
 
             if (!kartlar || kartlar.length === 0) {
-                container.innerHTML = "<div style='color: #888; font-size: 11px; text-align: center; margin-top: 10px;'>Sistemde kayıtlı yetkili kart yok.</div>";
+                container.innerHTML = "<div class='bos-liste-uyari'>Sistemde kayıtlı yetkili kart yok.</div>";
                 return;
             }
 
-            // Dizideki her bir kart için şık bir satır oluştur
+            // Dizideki her bir kart için şık bir satır oluştur (CSS class'ları ile)
             kartlar.forEach(kartId => {
                 const satir = document.createElement("div");
-                satir.style.display = "flex";
-                satir.style.justifyContent = "space-between";
-                satir.style.alignItems = "center";
-                satir.style.backgroundColor = "#1A212D";
-                satir.style.padding = "8px 12px";
-                satir.style.marginBottom = "6px";
-                satir.style.borderRadius = "6px";
-                satir.style.border = "1px solid var(--border-renk)";
+                satir.className = "kart-satir";
 
-                // Satırın içine Kart ID'sini ve SİL butonunu yerleştir
                 satir.innerHTML = `
-                    <span style="font-family: 'Consolas', monospace; color: #FFF; font-size: 12px; font-weight: bold; letter-spacing: 1px;">${kartId}</span>
-                    <button onclick="kartSilKomutuGonder('${kartId}')" style="margin: 0; padding: 4px 10px; background-color: transparent; border: 1px solid var(--faulted); color: var(--faulted); font-size: 10px;">SİL</button>
-                `;
+            <span class="kart-id-metin">${kartId}</span>
+            <button class="kart-sil-btn" onclick="kartSilKomutuGonder('${kartId}')">SİL</button>
+        `;
 
                 container.appendChild(satir);
             });

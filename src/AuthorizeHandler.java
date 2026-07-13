@@ -5,9 +5,7 @@ import org.json.JSONObject;
 public class AuthorizeHandler implements OcppMessageHandler {
 
     @Override
-    public void handle(WebSocket conn, String messageId, JSONObject payload) {
-
-        String stationId = conn.getResourceDescriptor().replace("/", "");
+    public void handle(WebSocket conn, String messageId, JSONObject payload, String stationId) {
 
         String idTag = payload.getString("idTag");
         System.out.println("\n-> [AUTHORIZE] Station ID: " + stationId + " | Verifying RFID Tag: " + idTag);
@@ -16,10 +14,10 @@ public class AuthorizeHandler implements OcppMessageHandler {
         JSONObject uiMessage = new JSONObject();
 
         if (OcppServer.cards.contains(idTag)) {
-            idTagInfo.put("status", "Accepted");
+            idTagInfo.put("status", OcppConstants.STATUS_ACCEPTED);
             System.out.println("[RESULT] Card ACCEPTED. Authorization successful.");
         } else {
-            idTagInfo.put("status", "Invalid");
+            idTagInfo.put("status", OcppConstants.STATUS_INVALID);
             System.out.println("[RESULT] Card REJECTED! Unauthorized access attempt.");
         }
         uiMessage.put("action", "Authorize");
