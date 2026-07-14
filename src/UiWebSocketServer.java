@@ -96,6 +96,7 @@ public class UiWebSocketServer extends WebSocketServer {
                     if (cmd.equals("RemoteStartTransaction")) {
                         ocppPaketi.put("RemoteStartTransaction");
                         cmdPayload.put("idTag", uiKarti);
+                        cmdPayload.put("connectorId", 1);
                     } else if (cmd.equals("RemoteStopTransaction")) {
                         ocppPaketi.put("RemoteStopTransaction");
                         cmdPayload.put("transactionId", txId);

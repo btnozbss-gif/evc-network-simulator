@@ -5,6 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vestel EVC - Gelişmiş Simülasyon Merkezi</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Rajdhani:wght@500;600;700&family=Roboto+Mono:wght@400;600&display=swap"
+        rel="stylesheet">
+
     <style>
         :root {
             --vestel-kirmizi: #E30613;
@@ -22,7 +29,7 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: var(--arka-plan);
             color: var(--metin-renk);
             margin: 0;
@@ -223,13 +230,26 @@
             background-color: rgba(227, 6, 19, 0.1);
         }
 
-        /* --- ANA İÇERİK VE SPA SAYFALARI --- */
+        /* Grid hareket animasyonu */
+        @keyframes gridKaydir {
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: 40px 40px;
+            }
+        }
+
         #ana-icerik {
             flex-grow: 1;
             position: relative;
-            background-image: radial-gradient(circle, #1a212d 1px, transparent 1px);
+            /* Arka plan noktalarını biraz daha belirgin yapıyoruz */
+            background-image: radial-gradient(circle, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
             background-size: 40px 40px;
             overflow-y: auto;
+            /* Sonsuz ve yavaş bir akış animasyonu ekledik */
+            animation: gridKaydir 4s linear infinite;
         }
 
         .sayfa {
@@ -265,15 +285,49 @@
             }
         }
 
+        /* --- TİPOGRAFİ ÖZELLEŞTİRMELERİ --- */
+
+        /* Başlıklar, Güç Değerleri ve Menüler (Siber Teknik Hissiyat) */
+        h1,
+        h2,
+        h3,
+        h4,
+        .sayfa-baslik,
+        .v-power-deger,
+        .cihaz-durum,
+        .menu-item {
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        /* Loglar, ID'ler, İstatistik Rakamları (Kusursuz Hizalama) */
+        #terminal,
+        #modal-terminal,
+        .log-saat,
+        .kart-id-metin,
+        .cihaz-id,
+        .stat-deger,
+        .v-power-birim {
+            font-family: 'Roboto Mono', monospace;
+        }
+
         /* --- İSTATİSTİK VE KART MODÜLLERİ --- */
         .istatistik-kapsayici {
-            background-color: #0B0E14;
+            background-color: rgba(11, 14, 20, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             padding: 25px;
             border-radius: 12px;
-            border: 1px solid var(--border-renk);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             margin-bottom: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             max-width: 500px;
+            transition: all 0.3s;
+        }
+
+        .istatistik-kapsayici:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(255, 255, 255, 0.03);
         }
 
         .stat-baslik {
@@ -470,20 +524,37 @@
             padding: 20px;
             height: 60vh;
             overflow-y: auto;
-            font-family: 'Consolas', monospace;
             font-size: 12px;
             color: #999;
             box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
         }
 
+        /* MODAL ARKA PLAN VE YERLEŞİMİ (EKSİK OLAN KISIM) */
+        #istasyon-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
         .modal-icerik {
-            background-color: var(--panel-arka);
+            background-color: rgba(21, 26, 35, 0.85);
             border: 1px solid var(--border-renk);
+            backdrop-filter: blur(15px);
             border-radius: 16px;
-            width: 700px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
             padding: 0;
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-            overflow: hidden;
         }
 
         .modal-baslik {
@@ -493,6 +564,9 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--border-renk);
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
         .modal-baslik h2 {
@@ -787,7 +861,6 @@
             padding: 15px;
             margin: 0 25px 25px 25px;
             overflow-y: auto;
-            font-family: 'Consolas', monospace;
             font-size: 11px;
             color: #888;
         }
@@ -832,7 +905,6 @@
         /* --- YENİ EKLENEN TEMİZLİK SINIFLARI --- */
         .log-saat {
             color: #444;
-            font-family: 'Consolas', monospace;
         }
 
         .kart-satir {
@@ -847,7 +919,6 @@
         }
 
         .kart-id-metin {
-            font-family: 'Consolas', monospace;
             color: #FFF;
             font-size: 12px;
             font-weight: bold;
@@ -906,6 +977,99 @@
         @media (max-width: 768px) {
             .grafik-kapsayici {
                 height: 150px;
+            }
+        }
+
+        /* İstasyon kutularına cam efekti temel hazırlığı */
+        .cihaz-kutu {
+            background-color: rgba(21, 26, 35, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .cihaz-kutu:hover {
+            transform: translateY(-5px);
+            background-color: rgba(28, 35, 49, 0.9);
+            /* Eski düz siyah gölge yerine, aşağıda renklere göre ezilecek glow ekliyoruz */
+        }
+
+        /* --- DURUMA GÖRE NEON PARLAMA EFEKTLERİ --- */
+        .st-available:hover {
+            border-color: var(--available);
+            box-shadow: 0 10px 25px rgba(0, 230, 118, 0.2), inset 0 0 10px rgba(0, 230, 118, 0.1);
+        }
+
+        .st-preparing:hover {
+            border-color: var(--preparing);
+            box-shadow: 0 10px 25px rgba(255, 234, 0, 0.2), inset 0 0 10px rgba(255, 234, 0, 0.1);
+        }
+
+        .st-charging:hover {
+            border-color: var(--charging);
+            box-shadow: 0 10px 25px rgba(0, 229, 255, 0.3), inset 0 0 15px rgba(0, 229, 255, 0.15);
+        }
+
+        .st-finishing:hover {
+            border-color: var(--finishing);
+            box-shadow: 0 10px 25px rgba(213, 0, 249, 0.2), inset 0 0 10px rgba(213, 0, 249, 0.1);
+        }
+
+        .st-faulted:hover {
+            border-color: var(--faulted);
+            box-shadow: 0 10px 25px rgba(255, 23, 68, 0.3), inset 0 0 15px rgba(255, 23, 68, 0.15);
+        }
+
+        .st-unavailable:hover {
+            border-color: var(--unavailable);
+            box-shadow: 0 10px 25px rgba(96, 125, 139, 0.2);
+        }
+
+        /* --- TOAST BİLDİRİM MİMARİSİ --- */
+        #toast-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .toast-mesaj {
+            background: rgba(21, 26, 35, 0.95);
+            backdrop-filter: blur(10px);
+            border-left: 4px solid var(--available);
+            color: #fff;
+            padding: 16px 24px;
+            border-radius: 6px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideInRight 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), fadeOut 0.4s ease 3.6s forwards;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                visibility: hidden;
+                margin-top: -60px;
             }
         }
     </style>
@@ -1022,20 +1186,20 @@
         </div>
 
     </div>
-    <div id="istasyon-modal" class="modal-arkaplan">
+    <div id="istasyon-modal">
         <div class="modal-icerik">
+
             <div class="modal-baslik">
                 <h2 id="modal-istasyon-isim">VESTEL_01 EV CHARGER</h2>
                 <button class="kapat-btn" onclick="modalKapat()">&times;</button>
             </div>
+
             <div class="victron-ekran">
                 <div class="topology-kapsayici" id="sim-topology">
                     <svg class="network-svg" viewBox="0 0 500 100">
                         <path class="kablo" d="M 120 40 L 250 40" />
                         <path class="kablo" d="M 250 40 L 380 40" />
-
                         <path class="kablo-akis data-akis kablo-data-akis" d="M 120 40 L 250 40" />
-
                         <path class="kablo-akis enerji-akis kablo-enerji-akis" d="M 250 40 L 380 40" />
 
                         <g transform="translate(60, 15)">
@@ -1088,30 +1252,29 @@
                     <canvas id="sarj-grafigi"></canvas>
                 </div>
             </div>
+
+            <div class="modal-kontroller">
+                <p class="kontrol-baslik">Uzaktan Komutlar (Remote Operations)</p>
+                <div class="modal-buton-grup">
+                    <button onclick="uzaktanKomutGonder('RemoteStartTransaction')"
+                        style="border-left: 3px solid var(--available);">ŞARJ BAŞLAT</button>
+                    <button onclick="uzaktanKomutGonder('RemoteStopTransaction')"
+                        style="border-left: 3px solid var(--finishing);">ŞARJ DURDUR</button>
+                    <button onclick="uzaktanKomutGonder('UnlockConnector')"
+                        style="border-left: 3px solid var(--charging);">KİLİDİ AÇ</button>
+                    <button onclick="uzaktanKomutGonder('SoftReset')"
+                        style="border-left: 3px solid var(--preparing);">SOFT RESET</button>
+                    <button onclick="uzaktanKomutGonder('HardReset')"
+                        style="border-left: 3px solid var(--faulted);">HARD RESET</button>
+                </div>
+
+                <p class="kontrol-baslik">İstasyon İletişim Logları (OCPP)</p>
+                <div id="modal-terminal"></div>
+            </div>
+
         </div>
     </div>
-
-    <div class="modal-kontroller">
-        <p class="kontrol-baslik">Uzaktan Komutlar (Remote Operations)</p>
-        <div class="modal-buton-grup">
-            <button onclick="uzaktanKomutGonder('RemoteStartTransaction')"
-                style="border-left: 3px solid var(--available);">ŞARJ BAŞLAT</button>
-            <button onclick="uzaktanKomutGonder('RemoteStopTransaction')"
-                style="border-left: 3px solid var(--finishing);">ŞARJ DURDUR</button>
-            <button onclick="uzaktanKomutGonder('UnlockConnector')"
-                style="border-left: 3px solid var(--charging);">KİLİDİ AÇ</button>
-            <button onclick="uzaktanKomutGonder('SoftReset')" style="border-left: 3px solid var(--preparing);">SOFT
-                RESET</button>
-            <button onclick="uzaktanKomutGonder('HardReset')" style="border-left: 3px solid var(--faulted);">HARD
-                RESET</button>
-        </div>
-
-        <p class="kontrol-baslik">İstasyon İletişim Logları (OCPP)</p>
-        <div id="modal-terminal"></div>
-    </div>
-    </div>
-    </div>
-
+    <div id="toast-container"></div>
     <script>
         // SPA (Single Page Application) Sayfa Değiştirici
         function sayfaDegistir(sayfaId, tiklananButon) {
@@ -1146,6 +1309,7 @@
             if (sessionStorage.getItem("oturum_gecerli") === "evet") {
                 document.getElementById("login-ekrani").style.display = "none";
                 sistemiHazirla();
+                sunucuyaBaglan();
             }
         };
 
@@ -1219,109 +1383,138 @@
         // ==========================================
         // WEBSOCKET KÖPRÜSÜ (JAVA İLE HABERLEŞME)
         // ==========================================
+        // ==========================================
+        // WEBSOCKET KÖPRÜSÜ (JAVA İLE HABERLEŞME)
+        // ==========================================
         function sunucuyaBaglan() {
             logYaz("UI Sunucusuna (Port 8888) bağlanılıyor...", "#FF9800");
             makine = new WebSocket("ws://localhost:8888");
 
+            const btn = document.getElementById("btn-baglan");
+            btn.disabled = true;
+            btn.innerText = "🔌 Bağlanıyor...";
+
             makine.onopen = function () {
                 logYaz("Bağlantı Başarılı! Java sunucusu dinleniyor.", "#00E676");
-                document.getElementById("btn-baglan").disabled = true;
-                document.getElementById("btn-baglan").innerText = "BAĞLI (PORT: 8888)";
-                document.getElementById("btn-baglan").style.backgroundColor = "#00E676";
+                btn.innerText = "BAĞLI (PORT: 8888)";
+                btn.style.backgroundColor = "#00E676";
+                toastGoster("Java Sunucusuna Bağlanıldı", "#00E676", "🚀");
             };
 
+            // İŞTE EKSİK OLAN O SİHİRLİ KISIM BURASI (Arayüzü çizen kalbimiz)
             makine.onmessage = function (event) {
-                // Java sunucusundan (UiWebSocketServer) gelen JSON'u okuyoruz
-                const data = JSON.parse(event.data);
-                const stationId = data.stationId;
-                dataAkisiTetikle(stationId);
+                try {
+                    const data = JSON.parse(event.data);
+                    const action = data.action;
+                    const stationId = data.stationId;
 
-                // 1. BootNotification: Yeni cihaz ağa katıldığında kutuyu oluştur
-                if (data.action === "BootNotification") {
-                    logYaz(`[BOOT] Yeni cihaz katıldı: ${stationId} (${data.chargePointVendor})`, "#00E5FF", stationId);
-                    cihazKutusuOlustur(stationId);
-                }
+                    // Her mesajda siber ağ animasyonunu (data akışı) tetikle
+                    if (stationId) dataAkisiTetikle(stationId);
 
-                // 2. StatusNotification: Cihazın rengini ve durumunu değiştir
-                else if (data.action === "StatusNotification") {
-                    let logMesaji = `[STATUS] ${stationId} durumu: ${data.status}`;
-                    if (data.errorCode && data.errorCode !== "NOERROR") {
-                        logMesaji += ` (Hata: ${data.errorCode})`;
-                        logYaz(logMesaji, "#FF1744", stationId);
-                    } else {
-                        logYaz(logMesaji, "#ccc", stationId);
-                    }
-                    arayuzuGuncelle(stationId, data.status);
-                }
+                    switch (action) {
+                        case "BootNotification":
+                            cihazKutusuOlustur(stationId);
+                            logYaz(`[BOOT] ${stationId} uyandı. Model: ${data.chargePointModel}`, "#00E676", stationId);
+                            break;
 
-                // 3. Heartbeat: Kalp atışı
-                else if (data.action === "Heartbeat") {
-                    logYaz(`[HEARTBEAT] ${stationId} çevrimiçi.`, "#666", stationId);
-                }
+                        case "StatusNotification":
+                            arayuzuGuncelle(stationId, data.status);
+                            logYaz(`[STATUS] ${stationId} -> ${data.status} (${data.errorCode})`, "#FFEA00", stationId);
+                            break;
 
-                // 4. Authorize: Kart okutma sonucu
-                else if (data.action === "Authorize") {
-                    const renk = data.status === "Accepted" ? "#00E676" : "#FF1744";
-                    logYaz(`[AUTHORIZE] RFID: ${data.idTag} | Sonuç: ${data.status}`, renk, stationId);
-                }
+                        case "StartTransaction":
+                            const baslayanCihaz = istasyonlar.find(c => c.id === stationId);
+                            if (baslayanCihaz) {
+                                baslayanCihaz.transactionId = data.transactionId;
+                                baslayanCihaz.harcananKwh = "0.00";
+                            }
+                            logYaz(`[ŞARJ BAŞLADI] ${stationId} - İşlem ID: ${data.transactionId}`, "#00E5FF", stationId);
+                            break;
 
-                // 5. StartTransaction: Şarj fiilen başladı
-                else if (data.action === "StartTransaction") {
-                    logYaz(`[TRANSACTION] Başladı! (ID: ${data.transactionId})`, "#00E5FF", stationId);
-                    const cihaz = istasyonlar.find(c => c.id === stationId);
-                    if (cihaz) {
-                        cihaz.transactionId = data.transactionId;
-                        cihaz.sarjYuzdesi = 0; // Şimdilik 0, ileride MeterValues ile dolacak
-                    }
-                }
+                        case "StopTransaction":
+                            const duranCihaz = istasyonlar.find(c => c.id === stationId);
+                            if (duranCihaz) {
+                                duranCihaz.transactionId = null;
+                                // Gelen meterStop (Wh) değerini kWh'a çeviriyoruz
+                                duranCihaz.harcananKwh = (data.meterStop / 1000).toFixed(2);
+                            }
+                            logYaz(`[ŞARJ BİTTİ] ${stationId} - Toplam Enerji: ${data.meterStop} Wh`, "#D500F9", stationId);
+                            if (aktifModalIstasyonu === stationId) modalGorselleriniGuncelle();
+                            break;
 
-                // 6. StopTransaction: Şarj fiilen bitti
-                else if (data.action === "StopTransaction") {
-                    logYaz(`[TRANSACTION] Bitti! Toplam Tüketim: ${data.meterStop} Wh`, "#D500F9", stationId);
-                    const cihaz = istasyonlar.find(c => c.id === stationId);
-                    if (cihaz) {
-                        cihaz.transactionId = null;
-                        cihaz.harcananKwh = (data.meterStop / 1000).toFixed(2);
-                    }
-                    modalGorselleriniGuncelle();
-                }
-                else if (data.action === "UpdateCardList") {
-                    logYaz(`[SİSTEM] Java'dan güncel kart listesi alındı: ${data.cards.length} adet kart.`, "#FFEA00");
-                    window.guncelKartlar = data.cards;
-                    kartListesiniCiz(data.cards);
-                }
-                // 8. MeterValues: Cihazdan anlık tüketim verisi geldiğinde
-                else if (data.action === "MeterValues") {
-                    const cihaz = istasyonlar.find(c => c.id === stationId);
+                        case "MeterValues":
+                            const cihaz = istasyonlar.find(c => c.id === stationId);
+                            if (cihaz) {
+                                if (!cihaz.transactionId && data.transactionId) {
+                                    cihaz.transactionId = data.transactionId;
+                                    logYaz(`[SİSTEM] Kurtarılan İşlem ID'si: ${data.transactionId} hafızaya alındı.`, "#FF9800", stationId);
+                                }
 
-                    if (cihaz && cihaz.status === "CHARGING") {
-                        // Java'dan gelen Wh (Watt-saat) değerini kWh'a çeviriyoruz
-                        const harcananKwh = (parseFloat(data.meterValue) / 1000).toFixed(2);
-                        cihaz.harcananKwh = harcananKwh;
+                                const kwDeger = (parseFloat(data.meterValue) / 1000).toFixed(1);
+                                cihaz.anlikKw = kwDeger;
 
-                        // Anlık çekilen gücü (kW) dinamik bir görüntü vermek için sahte dalgalandırıyoruz
-                        cihaz.anlikKw = (21.5 + Math.random()).toFixed(1);
-                        if (aktifModalIstasyonu === stationId) { grafigeVeriEkle(cihaz.anlikKw); }
+                                cihaz.harcananKwh = (parseFloat(cihaz.harcananKwh || 0) + (kwDeger * 0.01)).toFixed(2);
 
-                        // Eski if (cihaz.sarjYuzdesi % 5 === 0) kısmını silip yerine bunu yapıştır:
-                        cihaz.meterCount = (cihaz.meterCount || 0) + 1;
-                        if (cihaz.meterCount % 5 === 0) {
-                            logYaz(`[SAYAÇ] ${stationId}: ${harcananKwh} kWh enerji transfer edildi.`, "#00E5FF", stationId);
+                                cihaz.meterCount = (cihaz.meterCount || 0) + 1;
+                                if (cihaz.meterCount % 5 === 0) {
+                                    logYaz(`[ENERJİ AKIŞI] ${stationId}: ${cihaz.anlikKw} kW güç çekiliyor.`, "#00E5FF", stationId);
+                                }
+
+                                if (aktifModalIstasyonu === stationId) {
+                                    grafigeVeriEkle(cihaz.anlikKw);
+                                    modalGorselleriniGuncelle();
+                                }
+                            }
+                            break;
+
+                        case "UpdateCardList":
+                            kartListesiniCiz(data.cards);
+                            break;
+
+                        case "Heartbeat":
+                            logYaz(`[HEARTBEAT] ${stationId} yaşıyor.`, "#607D8B", stationId);
+                            break;
+
+                        case "StationDisconnected": { // [DÜZELTME 2] Kapsam(Scope) çakışmasını önlemek için süslü parantez eklendi
+                            // 1. İstasyonun kutusunu HTML (DOM) üzerinden bul ve garantili yöntemle sil
+                            const silinecekKutu = document.getElementById("kutu-" + stationId);
+                            if (silinecekKutu && silinecekKutu.parentNode) {
+                                silinecekKutu.parentNode.removeChild(silinecekKutu);
+                            }
+
+                            // 2. JavaScript hafızasından (diziden) çıkar
+                            const sIndex = istasyonlar.findIndex(c => c.id === stationId);
+                            if (sIndex > -1) {
+                                istasyonlar.splice(sIndex, 1);
+                            }
+
+                            // 3. Sol taraftaki istatistik rakamlarını canlı güncelle
+                            istatistikleriHesapla();
+
+                            // 4. Eğer o an bu cihazın detay (modal) ekranı açıksa ekranı kapat
+                            if (aktifModalIstasyonu === stationId) {
+                                modalKapat();
+                                toastGoster("İstasyon bağlantısı koptuğu için panel kapatıldı.", "#FF1744", "🔌");
+                            }
+
+                            logYaz(`[SİSTEM] ${stationId} ağdan koptu ve arayüzden kaldırıldı.`, "#FF1744");
+                            break;
                         }
-
-                        // Eğer o an bu cihazın detay (modal) ekranı açıksa, görselleri CANLI güncelle!
-                        if (aktifModalIstasyonu === stationId) {
-                            modalGorselleriniGuncelle();
-                        }
                     }
+                } catch (e) {
+                    console.log("Mesaj islenemedi: ", e);
                 }
             };
 
             makine.onclose = function () {
-                logYaz("Java sunucusu ile bağlantı koptu!", "#FF1744");
-                document.getElementById("btn-baglan").disabled = false;
-                document.getElementById("btn-baglan").innerText = "🔌 Sunucuya Bağlan";
-                document.getElementById("btn-baglan").style.backgroundColor = "#005A9E";
+                logYaz("Java sunucusu ile bağlantı koptu veya kapatıldı.", "#FF1744");
+
+                // Bağlantı kopunca butonu normal haline geri çevir (Manuel bağlanma için)
+                btn.disabled = false;
+                btn.innerText = "🔌 Sunucuya Bağlan";
+                btn.style.backgroundColor = "#005A9E";
+
+                toastGoster("Sunucu Bağlantısı Kesildi!", "#FF1744", "🚨");
             };
         }
         // ==========================================
@@ -1377,6 +1570,20 @@
 
             makine.send(JSON.stringify(paket));
             logYaz(`[KOMUT] Merkezden cihaza ${komutAdi} isteği gönderildi. (Kart: ${idTagGonderilecek || "Yok"})`, "#FF9800", aktifModalIstasyonu);
+        }
+        function toastGoster(mesaj, renkKodu = "#00E676", ikon = "🔌") {
+            const container = document.getElementById("toast-container");
+            const toast = document.createElement("div");
+            toast.className = "toast-mesaj";
+            toast.style.borderLeftColor = renkKodu;
+            toast.innerHTML = `<span>${ikon}</span> <span>${mesaj}</span>`;
+
+            container.appendChild(toast);
+
+            // Animasyon bittiğinde DOM'dan temizle ki birikmesin
+            setTimeout(() => {
+                if (toast.parentNode) toast.remove();
+            }, 4000);
         }
 
         // ==========================================

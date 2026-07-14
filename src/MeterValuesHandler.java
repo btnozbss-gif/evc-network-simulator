@@ -9,14 +9,25 @@ public class MeterValuesHandler implements OcppMessageHandler {
 
         int transactionId = payload.getInt("transactionId");
 
+        if (!OcppServer.activeTransactions.containsKey(transactionId)) {
+            System.out.println("[GHOST METER] Ignoring offline MeterValues for old transaction: " + transactionId);
+
+            JSONObject cevapPayload = new JSONObject();
+            JSONArray cevapDizisi = new JSONArray();
+            cevapDizisi.put(OcppConstants.CALL_RESULT);
+            cevapDizisi.put(messageId);
+            cevapDizisi.put(cevapPayload);
+            conn.send(cevapDizisi.toString());
+
+            return;
+        }
+
         String meterString = "0";
-
         JSONArray meterValueArray = payload.optJSONArray("meterValue");
-        if (meterValueArray != null && meterValueArray.length() > 0) {
 
+        if (meterValueArray != null && meterValueArray.length() > 0) {
             JSONArray sampledValueArray = meterValueArray.getJSONObject(0).optJSONArray("sampledValue");
             if (sampledValueArray != null && sampledValueArray.length() > 0) {
-
                 meterString = sampledValueArray.getJSONObject(0).optString("value", "0");
             }
         }
@@ -32,7 +43,6 @@ public class MeterValuesHandler implements OcppMessageHandler {
         UiWebSocketServer.broadcastToUi(uiMessage.toString());
 
         JSONObject cevapPayload = new JSONObject();
-
         JSONArray cevapDizisi = new JSONArray();
         cevapDizisi.put(OcppConstants.CALL_RESULT);
         cevapDizisi.put(messageId);

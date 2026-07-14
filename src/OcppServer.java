@@ -39,8 +39,20 @@ public class OcppServer extends WebSocketServer {
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
         String stationId = conn.getResourceDescriptor().replace("/", "");
-        activeConnections.remove(stationId, conn);
-        System.out.println("\n[DISCONNECTED] Station connection lost: " + conn.getRemoteSocketAddress());
+
+        activeConnections.remove(stationId);
+        stations.remove(stationId);
+
+        System.out.println("\n[DISCONNECTED] Station connection lost: " + stationId);
+
+        try {
+            JSONObject uiMessage = new JSONObject();
+            uiMessage.put("action", "StationDisconnected");
+            uiMessage.put("stationId", stationId);
+            UiWebSocketServer.broadcastToUi(uiMessage.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
