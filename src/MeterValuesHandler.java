@@ -7,9 +7,9 @@ public class MeterValuesHandler implements OcppMessageHandler {
     @Override
     public void handle(WebSocket conn, String messageId, JSONObject payload, String stationId) {
 
-        int transactionId = payload.getInt("transactionId");
+        int transactionId = payload.optInt("transactionId", 0);
 
-        if (!OcppServer.activeTransactions.containsKey(transactionId)) {
+        if (transactionId != 0 && !OcppServer.activeTransactions.containsKey(transactionId)) {
             System.out.println("[GHOST METER] Ignoring offline MeterValues for old transaction: " + transactionId);
 
             JSONObject cevapPayload = new JSONObject();

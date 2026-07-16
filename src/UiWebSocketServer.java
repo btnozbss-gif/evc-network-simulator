@@ -100,6 +100,10 @@ public class UiWebSocketServer extends WebSocketServer {
                     } else if (cmd.equals("RemoteStopTransaction")) {
                         ocppPaketi.put("RemoteStopTransaction");
                         cmdPayload.put("transactionId", txId);
+                    } else if (cmd.equals("TriggerMessage")) {
+                        ocppPaketi.put("TriggerMessage");
+                        String reqMsg = payload.optString("requestedMessage", "StatusNotification");
+                        cmdPayload.put("requestedMessage", reqMsg);
                     } else if (cmd.equals("SoftReset")) {
                         ocppPaketi.put("Reset");
                         cmdPayload.put("type", "Soft");

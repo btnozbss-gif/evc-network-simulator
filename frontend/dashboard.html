@@ -230,28 +230,6 @@
             background-color: rgba(227, 6, 19, 0.1);
         }
 
-        /* Grid hareket animasyonu */
-        @keyframes gridKaydir {
-            0% {
-                background-position: 0 0;
-            }
-
-            100% {
-                background-position: 40px 40px;
-            }
-        }
-
-        #ana-icerik {
-            flex-grow: 1;
-            position: relative;
-            /* Arka plan noktalarını biraz daha belirgin yapıyoruz */
-            background-image: radial-gradient(circle, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
-            background-size: 40px 40px;
-            overflow-y: auto;
-            /* Sonsuz ve yavaş bir akış animasyonu ekledik */
-            animation: gridKaydir 4s linear infinite;
-        }
-
         .sayfa {
             display: none;
             padding: 40px;
@@ -414,33 +392,6 @@
             gap: 25px;
         }
 
-        .cihaz-kutu {
-            background-color: var(--panel-arka);
-            border: 1px solid var(--border-renk);
-            border-radius: 12px;
-            padding: 25px 15px;
-            text-align: center;
-            transition: all 0.3s;
-            position: relative;
-            cursor: pointer;
-        }
-
-        .cihaz-kutu::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            transition: all 0.3s;
-        }
-
-        .cihaz-kutu:hover {
-            transform: translateY(-7px);
-            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.6);
-            background-color: #1C2331;
-        }
-
         .cihaz-id {
             font-size: 15px;
             font-weight: bold;
@@ -516,57 +467,209 @@
             border-color: rgba(96, 125, 139, 0.3);
         }
 
-        /* --- TERMİNAL LOGLARI --- */
-        #terminal {
-            background-color: #05070A;
-            border: 1px solid var(--border-renk);
+        /* --- DİNAMİK RADAR ARKA PLAN --- */
+        #ana-icerik {
+            flex-grow: 1;
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+            background-color: var(--arka-plan);
+            /* Sabit Siber Grid (Izgara) Deseni */
+            background-image:
+                linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 1;
+        }
+
+
+        /* --- İSTASYON KUTULARI (3D GLASSMORPHISM) --- */
+        .cihaz-kutu {
+            /* Eski düz renkleri eziyoruz, buzlu cam yapıyoruz */
+            background-color: rgba(21, 26, 35, 0.5) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 12px;
-            padding: 20px;
-            height: 60vh;
+            padding: 25px 15px;
+            text-align: center;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            z-index: 2;
+            /* Radarın üstünde süzülsün */
+
+            /* 3D Hareket için yaylı geçiş (Cubic-Bezier) */
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                box-shadow 0.4s ease,
+                border-color 0.4s ease,
+                background-color 0.4s ease;
+        }
+
+        /* Kutu Hover Derinlik Efekti (Yukarı Kalkma) */
+        .cihaz-kutu:hover {
+            transform: translateY(-12px) scale(1.03);
+            background-color: rgba(28, 35, 49, 0.8) !important;
+        }
+
+        /* --- DURUMA GÖRE NEON PARLAMA EFEKTLERİ --- */
+        .st-available:hover {
+            border-color: var(--available);
+            box-shadow: 0 20px 40px rgba(0, 230, 118, 0.25), inset 0 0 15px rgba(0, 230, 118, 0.1);
+        }
+
+        .st-preparing:hover {
+            border-color: var(--preparing);
+            box-shadow: 0 20px 40px rgba(255, 234, 0, 0.25), inset 0 0 15px rgba(255, 234, 0, 0.1);
+        }
+
+        .st-charging:hover {
+            border-color: var(--charging);
+            box-shadow: 0 20px 40px rgba(0, 229, 255, 0.35), inset 0 0 20px rgba(0, 229, 255, 0.15);
+        }
+
+        .st-finishing:hover {
+            border-color: var(--finishing);
+            box-shadow: 0 20px 40px rgba(213, 0, 249, 0.25), inset 0 0 15px rgba(213, 0, 249, 0.1);
+        }
+
+        .st-faulted:hover {
+            border-color: var(--faulted);
+            box-shadow: 0 20px 40px rgba(255, 23, 68, 0.35), inset 0 0 20px rgba(255, 23, 68, 0.15);
+        }
+
+        .st-unavailable:hover {
+            border-color: var(--unavailable);
+            box-shadow: 0 20px 40px rgba(96, 125, 139, 0.3);
+        }
+
+        /* --- SİBER TERMİNAL (MATRIX EFEKTİ) --- */
+        #terminal,
+        #modal-terminal {
+            background-color: #05070A;
+            /* Matrix Tarama Çizgileri (Scanlines) Efekti */
+            background-image: repeating-linear-gradient(0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 230, 118, 0.03) 3px,
+                    rgba(0, 230, 118, 0.03) 4px);
+            border: 1px solid var(--border-renk);
+            border-radius: 8px;
+            padding: 15px;
             overflow-y: auto;
             font-size: 12px;
             color: #999;
-            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+            font-family: 'Roboto Mono', monospace;
         }
 
-        /* MODAL ARKA PLAN VE YERLEŞİMİ (EKSİK OLAN KISIM) */
-        #istasyon-modal {
+        #terminal {
+            height: 60vh;
+        }
+
+        #modal-terminal {
+            height: 150px;
+            margin: 0 25px 25px 25px;
+        }
+
+        /* Terminal İçi Satır Düzeni */
+        .log-satiri {
+            margin-bottom: 4px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .log-saat {
+            color: #555;
+            margin-right: 8px;
+        }
+
+        /* Hata Durumları İçin Glitch (Yırtılma) Efekti - GÜNCELLENDİ */
+        .glitch-efekti {
+            color: #FF1744 !important;
+            font-weight: bold;
+            /* Animasyon süresini ayarladık ve bittiğinde son halinde kalmasını (forwards) sağladık */
+            animation: textGlitch 0.5s ease-out forwards;
+        }
+
+        @keyframes textGlitch {
+            0% {
+                transform: translate(0);
+                text-shadow: none;
+            }
+
+            20% {
+                transform: translate(-2px, 1px);
+                text-shadow: 2px 0 #00E676, -2px 0 #00E5FF;
+            }
+
+            40% {
+                transform: translate(-2px, -1px);
+                text-shadow: -2px 0 #00E676, 2px 0 #00E5FF;
+            }
+
+            60% {
+                transform: translate(2px, 1px);
+                text-shadow: 2px 0 #00E676, -2px 0 #00E5FF;
+            }
+
+            80% {
+                transform: translate(2px, -1px);
+                text-shadow: -2px 0 #00E676, 2px 0 #00E5FF;
+            }
+
+            100% {
+                transform: translate(0);
+                text-shadow: none;
+            }
+
+        }
+
+        /* --- YANDAN AÇILAN SİBER PANEL (OFFCANVAS) --- */
+        .yan-panel {
             position: fixed;
             top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
+            right: -650px;
+            /* Panel genişliği kadar sağa gizle */
+            width: 600px;
+            max-width: 90vw;
+            height: 100vh;
+            background: rgba(11, 14, 20, 0.75);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-left: 3px solid var(--border-renk);
+            box-shadow: -15px 0 50px rgba(0, 0, 0, 0.8);
             z-index: 1000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(5px);
-        }
-
-        .modal-icerik {
-            background-color: rgba(21, 26, 35, 0.85);
-            border: 1px solid var(--border-renk);
-            backdrop-filter: blur(15px);
-            border-radius: 16px;
-            width: 90%;
-            max-width: 700px;
-            max-height: 90vh;
+            transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), border-left-color 0.4s, box-shadow 0.4s;
+            display: flex;
+            flex-direction: column;
             overflow-y: auto;
-            padding: 0;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
         }
 
-        .modal-baslik {
-            background-color: #0B0E14;
-            padding: 20px 25px;
+        .yan-panel.acik {
+            right: 0;
+        }
+
+        .panel-baslik {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--border-renk);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             position: sticky;
             top: 0;
             z-index: 10;
+        }
+
+        .panel-baslik h2 {
+            margin: 0;
+            color: #FFF;
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .modal-baslik h2 {
@@ -605,61 +708,70 @@
             margin-bottom: 30px;
         }
 
+        /* --- SİBER SVG VE ANİMASYON MOTORU --- */
         .network-svg {
             width: 100%;
             max-width: 550px;
-            height: 100px;
+            height: 120px;
             overflow: visible;
         }
 
         .node-bg {
-            fill: #0B0E14;
-            stroke: var(--border-renk);
-            stroke-width: 2;
-            rx: 8;
-            transition: 0.3s;
+            fill: rgba(11, 14, 20, 0.9);
+            stroke: rgba(255, 255, 255, 0.1);
+            stroke-width: 1.5;
+            transition: all 0.4s ease;
         }
 
         .node-icon {
-            fill: none;
-            stroke: #666;
-            stroke-width: 2;
-            transition: 0.3s;
+            fill: rgba(0, 229, 255, 0.05);
+            stroke: #888;
+            stroke-width: 1.5;
+            transition: all 0.4s ease;
             stroke-linejoin: round;
-            stroke-linecap: round;
-        }
-
-        .node-text {
-            fill: #666;
-            font-size: 11px;
-            font-weight: bold;
-            font-family: monospace;
-            letter-spacing: 1px;
         }
 
         .kablo {
             fill: none;
-            stroke: #1A212D;
-            stroke-width: 4;
-            stroke-linecap: round;
-        }
-
-        .kablo-akis {
-            fill: none;
+            stroke: rgba(255, 255, 255, 0.05);
             stroke-width: 3;
-            stroke-dasharray: 8, 8;
-            opacity: 0;
             stroke-linecap: round;
-            transition: opacity 0.3s;
         }
 
-        /* Enerji Akışı (İstasyon -> Araba) */
+        /* Fiber Optik Veri Akışı (Daha stabil ve yoğun parlama) */
+        .data-akis {
+            stroke-width: 3;
+            stroke: #00E676;
+            stroke-dasharray: 10 10;
+            /* Toplam döngü: 20 birim */
+            filter: drop-shadow(0 0 6px #00E676);
+            animation: kaydirakData 0.5s linear infinite;
+        }
+
+        /* Plazma Enerji Akışı */
         .enerji-akis {
-            stroke: var(--charging);
-            animation: dashFlow 1s linear infinite reverse;
-            filter: drop-shadow(0 0 6px var(--charging));
+            stroke-width: 4;
+            stroke: #00E5FF;
+            stroke-dasharray: 15 15;
+            /* Toplam döngü: 30 birim */
+            filter: drop-shadow(0 0 10px #00E5FF);
+            animation: kaydirakEnerji 0.6s linear infinite;
         }
 
+        /* Holografik Araç Kalkanı */
+        .hologram-kalkan {
+            fill: rgba(0, 229, 255, 0.02);
+            stroke: var(--charging);
+            stroke-width: 1.5;
+            stroke-dasharray: 4 8;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            transform-origin: center;
+        }
+
+        /* --- DURUM TETİKLEYİCİLERİ (JAVASCRIPT BURAYI KONTROL EDER) --- */
+
+        /* 1. Şarj Durumu Aktifken */
         #sim-topology.sarjda .kablo-enerji-akis {
             opacity: 1;
         }
@@ -667,20 +779,21 @@
         #sim-topology.sarjda .car-icon,
         #sim-topology.sarjda .station-icon {
             stroke: var(--charging);
+            fill: rgba(0, 229, 255, 0.15);
             filter: drop-shadow(0 0 5px var(--charging));
         }
 
-        #sim-topology.sarjda .car-bg {
-            stroke: var(--charging);
+        #sim-topology.sarjda .hologram-kalkan {
+            opacity: 1;
+            animation: kalkanNefes 2s infinite ease-in-out, veriAkar 4s linear infinite reverse;
         }
 
-        /* Data Akışı (Sunucu <-> İstasyon) */
-        .data-akis {
-            stroke: var(--available);
-            animation: dashFlow 0.5s linear infinite;
-            filter: drop-shadow(0 0 6px var(--available));
+        #sim-topology.sarjda .station-led {
+            fill: var(--charging);
+            filter: drop-shadow(0 0 6px var(--charging));
         }
 
+        /* 2. Veri Transferi (Heartbeat, Boot, Status vs.) Aktifken */
         #sim-topology.data-aktif .kablo-data-akis {
             opacity: 1;
         }
@@ -691,71 +804,33 @@
             filter: drop-shadow(0 0 5px var(--available));
         }
 
-        #sim-topology.data-aktif .server-bg {
-            stroke: var(--available);
-        }
-
-        @keyframes dashFlow {
+        @keyframes kaydirakData {
             to {
-                stroke-dashoffset: 32;
+                stroke-dashoffset: -20;
             }
         }
 
-        .gorsel-simulasyon-alani {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            padding: 0 20px;
+        @keyframes kaydirakEnerji {
+            to {
+                stroke-dashoffset: -30;
+            }
         }
 
-        .araba-alani {
-            position: relative;
-            width: 280px;
-            height: 130px;
-            display: flex;
-            align-items: flex-end;
-        }
+        @keyframes kalkanNefes {
+            0% {
+                transform: scale(0.95);
+                opacity: 0.4;
+            }
 
-        .araba-svg {
-            width: 100%;
-            opacity: 0.3;
-            transition: all 0.5s ease;
-            filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.5));
-        }
+            50% {
+                transform: scale(1.02);
+                opacity: 0.8;
+            }
 
-        .araba-svg.sarjda {
-            opacity: 1;
-            filter: drop-shadow(0 10px 20px rgba(0, 229, 255, 0.4));
-        }
-
-        .araba-svg #port-isik {
-            transition: all 0.5s;
-            fill: #444;
-        }
-
-        .araba-svg.sarjda #port-isik {
-            fill: var(--charging);
-            filter: drop-shadow(0 0 5px var(--charging));
-        }
-
-        .sarj-kablosu {
-            position: absolute;
-            right: -5px;
-            bottom: 35px;
-            width: 50px;
-            height: 4px;
-            background-color: #1A212D;
-            transform-origin: left;
-            transform: rotate(-5deg);
-            transition: all 0.5s ease;
-            opacity: 0;
-        }
-
-        .sarj-kablosu.aktif {
-            background-color: var(--charging);
-            box-shadow: 0 0 12px var(--charging);
-            opacity: 1;
+            100% {
+                transform: scale(0.95);
+                opacity: 0.4;
+            }
         }
 
         .donut-container {
@@ -851,18 +926,6 @@
             letter-spacing: 1px;
             margin: 20px 25px 10px 25px;
             font-weight: bold;
-        }
-
-        #modal-terminal {
-            background-color: #05070A;
-            border: 1px solid var(--border-renk);
-            height: 120px;
-            border-radius: 6px;
-            padding: 15px;
-            margin: 0 25px 25px 25px;
-            overflow-y: auto;
-            font-size: 11px;
-            color: #888;
         }
 
         .kapat-btn {
@@ -980,54 +1043,11 @@
             }
         }
 
-        /* İstasyon kutularına cam efekti temel hazırlığı */
-        .cihaz-kutu {
-            background-color: rgba(21, 26, 35, 0.7);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .cihaz-kutu:hover {
-            transform: translateY(-5px);
-            background-color: rgba(28, 35, 49, 0.9);
-            /* Eski düz siyah gölge yerine, aşağıda renklere göre ezilecek glow ekliyoruz */
-        }
-
-        /* --- DURUMA GÖRE NEON PARLAMA EFEKTLERİ --- */
-        .st-available:hover {
-            border-color: var(--available);
-            box-shadow: 0 10px 25px rgba(0, 230, 118, 0.2), inset 0 0 10px rgba(0, 230, 118, 0.1);
-        }
-
-        .st-preparing:hover {
-            border-color: var(--preparing);
-            box-shadow: 0 10px 25px rgba(255, 234, 0, 0.2), inset 0 0 10px rgba(255, 234, 0, 0.1);
-        }
-
-        .st-charging:hover {
-            border-color: var(--charging);
-            box-shadow: 0 10px 25px rgba(0, 229, 255, 0.3), inset 0 0 15px rgba(0, 229, 255, 0.15);
-        }
-
-        .st-finishing:hover {
-            border-color: var(--finishing);
-            box-shadow: 0 10px 25px rgba(213, 0, 249, 0.2), inset 0 0 10px rgba(213, 0, 249, 0.1);
-        }
-
-        .st-faulted:hover {
-            border-color: var(--faulted);
-            box-shadow: 0 10px 25px rgba(255, 23, 68, 0.3), inset 0 0 15px rgba(255, 23, 68, 0.15);
-        }
-
-        .st-unavailable:hover {
-            border-color: var(--unavailable);
-            box-shadow: 0 10px 25px rgba(96, 125, 139, 0.2);
-        }
-
-        /* --- TOAST BİLDİRİM MİMARİSİ --- */
+        /* --- YENİ TOAST BİLDİRİM MİMARİSİ (SAĞ ÜST) --- */
         #toast-container {
             position: fixed;
-            bottom: 30px;
+            top: 30px;
+            /* Bottom yerine Top yaptık */
             right: 30px;
             z-index: 9999;
             display: flex;
@@ -1036,6 +1056,7 @@
         }
 
         .toast-mesaj {
+            /* ... arka plan, renk ve font özellikleri aynı kalacak ... */
             background: rgba(21, 26, 35, 0.95);
             backdrop-filter: blur(10px);
             border-left: 4px solid var(--available);
@@ -1050,27 +1071,166 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            animation: slideInRight 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), fadeOut 0.4s ease 3.6s forwards;
+            /* Animasyon isimlerini değiştirdik */
+            animation: slideInDown 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), fadeOutUp 0.4s ease 3.6s forwards;
         }
 
-        @keyframes slideInRight {
+        /* Yukarıdan Aşağı İnme Animasyonu */
+        @keyframes slideInDown {
             from {
-                transform: translateX(120%);
+                transform: translateY(-120%);
                 opacity: 0;
             }
 
             to {
-                transform: translateX(0);
+                transform: translateY(0);
                 opacity: 1;
             }
         }
 
-        @keyframes fadeOut {
+        /* Yukarı Doğru Kayarak Kaybolma Animasyonu */
+        @keyframes fadeOutUp {
             to {
                 opacity: 0;
                 visibility: hidden;
                 margin-top: -60px;
+                transform: translateY(-50%);
             }
+        }
+
+        /* --- SİBER FATURA / HOLOGRAFİK MAKBUZ --- */
+        .fatura-makbuz-holo {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(11, 14, 20, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 229, 255, 0.4);
+            border-radius: 8px;
+            padding: 40px 30px;
+            width: 340px;
+            z-index: 10000;
+            box-shadow: 0 0 40px rgba(0, 229, 255, 0.2), inset 0 0 20px rgba(0, 229, 255, 0.1);
+            /* 3D Rotasyonlu Geliş Animasyonu */
+            animation: makbuz3DIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            color: #fff;
+            font-family: 'Roboto Mono', monospace;
+            overflow: hidden;
+            /* Lazer dışarı taşmasın diye */
+            perspective: 1000px;
+        }
+
+        /* 3D Belirme Animasyonu */
+        @keyframes makbuz3DIn {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5) rotateX(60deg) rotateY(-10deg);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1) rotateX(0deg) rotateY(0deg);
+            }
+        }
+
+        /* Yukarı/Aşağı Kayan Lazer Tarayıcı Çizgi */
+        .laser-cizgi {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: #00E5FF;
+            box-shadow: 0 0 15px 5px rgba(0, 229, 255, 0.5);
+            animation: laserScan 2.5s infinite linear;
+            z-index: -1;
+        }
+
+        @keyframes laserScan {
+            0% {
+                top: -10%;
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                top: 110%;
+                opacity: 0;
+            }
+        }
+
+        /* Hologram İçerik Stilleri */
+        .fatura-makbuz-holo .fatura-baslik {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 24px;
+            color: var(--charging);
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+        }
+
+        .fatura-makbuz-holo .fatura-detay {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .fatura-makbuz-holo .fatura-detay .vurgu {
+            color: #FFF;
+            font-weight: bold;
+        }
+
+        .fatura-makbuz-holo .siber-ayrac {
+            border: none;
+            border-bottom: 1px dashed rgba(0, 229, 255, 0.3);
+            margin: 20px 0;
+        }
+
+        .fatura-makbuz-holo .fatura-toplam {
+            display: flex;
+            justify-content: space-between;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        .fatura-makbuz-holo .tutar-parlak {
+            color: var(--available);
+            text-shadow: 0 0 10px rgba(0, 230, 118, 0.4);
+        }
+
+        .fatura-btn-holo {
+            width: 100%;
+            background: transparent;
+            color: var(--charging);
+            padding: 12px;
+            border: 1px solid var(--charging);
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 13px;
+            letter-spacing: 1px;
+            text-shadow: 0 0 5px rgba(0, 229, 255, 0.3);
+        }
+
+        .fatura-btn-holo:hover {
+            background-color: rgba(0, 229, 255, 0.1);
+            box-shadow: inset 0 0 15px rgba(0, 229, 255, 0.3);
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -1179,83 +1339,92 @@
 
         <div id="sayfa-loglar" class="sayfa">
             <h2 class="sayfa-baslik">OCPP İletişim Trafiği</h2>
-            <div id="terminal">
-                > Sistem başlatılıyor...<br>
-                > Giriş bekleniyor.<br>
-            </div>
+            <div id="terminal"></div>
         </div>
 
     </div>
-    <div id="istasyon-modal">
-        <div class="modal-icerik">
+    <div id="istasyon-detay-panel" class="yan-panel">
+        <div class="panel-baslik">
+            <h2 id="modal-istasyon-isim">VESTEL_01 EV CHARGER</h2>
+            <button class="kapat-btn" onclick="modalKapat()">&times;</button>
+        </div>
 
-            <div class="modal-baslik">
-                <h2 id="modal-istasyon-isim">VESTEL_01 EV CHARGER</h2>
-                <button class="kapat-btn" onclick="modalKapat()">&times;</button>
+        <div class="victron-ekran">
+            <div class="topology-kapsayici" id="sim-topology">
+                <svg class="network-svg" viewBox="0 0 500 120">
+                    <path class="kablo" d="M 120 60 L 250 60" />
+                    <path class="kablo" d="M 250 60 L 380 60" />
+
+                    <path class="kablo-akis data-akis kablo-data-akis" d="M 120 60 L 250 60" />
+                    <path class="kablo-akis enerji-akis kablo-enerji-akis" d="M 250 60 L 380 60" />
+
+                    <g transform="translate(60, 35)">
+                        <rect class="node-bg server-bg" width="60" height="50" rx="6" />
+                        <path class="node-icon server-icon"
+                            d="M 15 15 h 30 v 6 h -30 z M 15 25 h 30 v 6 h -30 z M 15 35 h 15 v 6 h -15 z" />
+                        <circle cx="40" cy="38" r="2.5" fill="var(--available)" /> <text class="node-text" x="30" y="75"
+                            text-anchor="middle">CSMS (8888)</text>
+                    </g>
+
+                    <g transform="translate(220, 35)">
+                        <rect class="node-bg station-bg" width="60" height="50" rx="6" />
+                        <path class="node-icon station-icon" d="M 22 10 h 16 v 30 h -16 z M 30 15 v 8" />
+                        <circle cx="30" cy="32" r="3" class="station-led" />
+                        <text class="node-text" x="30" y="75" text-anchor="middle">VESTEL EVC04</text>
+                    </g>
+
+                    <g transform="translate(380, 35)">
+                        <ellipse class="hologram-kalkan" cx="30" cy="25" rx="45" ry="32" />
+
+                        <rect class="node-bg car-bg" width="60" height="50" rx="6" />
+                        <path class="node-icon car-icon"
+                            d="M 8 35 L 14 18 L 32 18 L 46 26 L 52 35 Z M 16 35 A 4 4 0 0 0 24 35 M 36 35 A 4 4 0 0 0 44 35" />
+                        <text class="node-text" x="30" y="75" text-anchor="middle">ARAÇ</text>
+                    </g>
+                </svg>
             </div>
 
-            <div class="victron-ekran">
-                <div class="topology-kapsayici" id="sim-topology">
-                    <svg class="network-svg" viewBox="0 0 500 100">
-                        <path class="kablo" d="M 120 40 L 250 40" />
-                        <path class="kablo" d="M 250 40 L 380 40" />
-                        <path class="kablo-akis data-akis kablo-data-akis" d="M 120 40 L 250 40" />
-                        <path class="kablo-akis enerji-akis kablo-enerji-akis" d="M 250 40 L 380 40" />
-
-                        <g transform="translate(60, 15)">
-                            <rect class="node-bg server-bg" width="60" height="50" x="0" y="0" />
-                            <path class="node-icon server-icon"
-                                d="M 15 25 Q 15 15 25 15 Q 30 5 40 15 Q 50 15 45 25 M 15 25 Q 5 25 10 35 L 50 35 Q 55 25 45 25" />
-                            <text class="node-text" x="30" y="70" text-anchor="middle">CSMS (8888)</text>
-                        </g>
-
-                        <g transform="translate(220, 15)">
-                            <rect class="node-bg station-bg" width="60" height="50" x="0" y="0" />
-                            <path class="node-icon station-icon" d="M 25 10 h 10 v 30 h -10 z M 20 40 h 20" />
-                            <text class="node-text" x="30" y="70" text-anchor="middle">VESTEL EVC04</text>
-                        </g>
-
-                        <g transform="translate(380, 15)">
-                            <rect class="node-bg car-bg" width="60" height="50" x="0" y="0" />
-                            <path class="node-icon car-icon"
-                                d="M 10 30 L 20 15 H 40 L 50 30 V 40 H 10 Z M 15 40 A 4 4 0 0 0 23 40 M 37 40 A 4 4 0 0 0 45 40" />
-                            <text class="node-text" x="30" y="70" text-anchor="middle">ELECTRIC VEHICLE</text>
-                        </g>
-                    </svg>
-                </div>
-
-                <div style="display: flex; justify-content: center; align-items: center; gap: 50px;">
-                    <div class="donut-container" id="modal-donut">
-                        <div class="donut-inner">
-                            <div style="display:flex; align-items:baseline;">
-                                <span class="v-power-deger" id="modal-kw-deger">0.0</span>
-                                <span class="v-power-birim">kW</span>
-                            </div>
-                            <div class="ac-info-badge"
-                                title="AC Şarj mimarisi (Type 2) gereği araçtan SoC (Batarya Yüzdesi) verisi alınamamaktadır.">
-                                ⚠️ AC MODE
-                            </div>
+            <div style="display: flex; justify-content: center; align-items: center; gap: 30px;">
+                <div class="donut-container" id="modal-donut">
+                    <div class="donut-inner">
+                        <div style="display:flex; align-items:baseline;">
+                            <span class="v-power-deger" id="modal-kw-deger">0.0</span>
+                            <span class="v-power-birim">kW</span>
                         </div>
-                    </div>
-                    <div class="v-detay-grid" style="flex-direction: column; gap: 15px;">
-                        <div class="v-detay-kutu">
-                            <p>Total Energy</p>
-                            <h4 id="modal-kwh-deger">0.00 <span>kWh</span></h4>
-                        </div>
-                        <div class="v-detay-kutu">
-                            <p>Connector</p>
-                            <h4 style="color:#FFF;">Type 2 <span>AC 22kW</span></h4>
+                        <div class="ac-info-badge"
+                            title="AC Şarj mimarisi (Type 2) gereği araçtan SoC (Batarya Yüzdesi) verisi alınamamaktadır.">
+                            ⚠️ AC MODE
                         </div>
                     </div>
                 </div>
-                <div class="grafik-kapsayici">
-                    <canvas id="sarj-grafigi"></canvas>
+                <div class="v-detay-grid" style="flex-direction: column; gap: 15px;">
+                    <div class="v-detay-kutu">
+                        <p>Total Energy</p>
+                        <h4 id="modal-kwh-deger">0.00 <span>kWh</span></h4>
+                    </div>
+                    <div class="v-detay-kutu">
+                        <p>Connector</p>
+                        <h4 style="color:#FFF;">Type 2 <span>AC 22kW</span></h4>
+                    </div>
                 </div>
             </div>
+            <div class="grafik-kapsayici">
+                <canvas id="sarj-grafigi"></canvas>
+            </div>
+        </div>
 
-            <div class="modal-kontroller">
-                <p class="kontrol-baslik">Uzaktan Komutlar (Remote Operations)</p>
-                <div class="modal-buton-grup">
+        <div class="modal-kontroller">
+            <p class="kontrol-baslik">Uzaktan Komutlar (Remote Operations)</p>
+            <div class="modal-buton-grup" style="padding: 0 25px;">
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <button onclick="tetikle('MeterValues')" style="border-left: 3px solid var(--charging);">ENERJİ İSTE
+                        (METER)</button>
+                    <button onclick="tetikle('StatusNotification')"
+                        style="border-left: 3px solid var(--preparing);">DURUM İSTE (STATUS)</button>
+                    <button onclick="tetikle('Heartbeat')" style="border-left: 3px solid #607D8B;">KALP ATIŞI
+                        İSTE</button>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
                     <button onclick="uzaktanKomutGonder('RemoteStartTransaction')"
                         style="border-left: 3px solid var(--available);">ŞARJ BAŞLAT</button>
                     <button onclick="uzaktanKomutGonder('RemoteStopTransaction')"
@@ -1264,14 +1433,13 @@
                         style="border-left: 3px solid var(--charging);">KİLİDİ AÇ</button>
                     <button onclick="uzaktanKomutGonder('SoftReset')"
                         style="border-left: 3px solid var(--preparing);">SOFT RESET</button>
-                    <button onclick="uzaktanKomutGonder('HardReset')"
-                        style="border-left: 3px solid var(--faulted);">HARD RESET</button>
                 </div>
-
-                <p class="kontrol-baslik">İstasyon İletişim Logları (OCPP)</p>
-                <div id="modal-terminal"></div>
+                <button onclick="uzaktanKomutGonder('HardReset')" style="border-left: 3px solid var(--faulted);">HARD
+                    RESET</button>
             </div>
 
+            <p class="kontrol-baslik">İstasyon İletişim Logları (OCPP)</p>
+            <div id="modal-terminal"></div>
         </div>
     </div>
     <div id="toast-container"></div>
@@ -1340,6 +1508,57 @@
             }
             logYaz("Sistemden çıkış yapıldı. Oturum kilitlendi.", "#FF9800");
         }
+        // ==========================================
+        // TRIGGER MESSAGE (TETİKLEME) FONKSİYONU
+        // ==========================================
+        function tetikle(mesajTipi) {
+            if (!makine || makine.readyState !== WebSocket.OPEN) {
+                toastGoster("Sunucuya bağlı değilsiniz!", "#FF1744", "🚨");
+                return;
+            }
+            if (!aktifModalIstasyonu) return;
+
+            const paket = {
+                action: "RemoteCommand",
+                stationId: aktifModalIstasyonu,
+                command: "TriggerMessage",
+                requestedMessage: mesajTipi
+            };
+
+            makine.send(JSON.stringify(paket));
+            logYaz(`[KOMUT] Merkezden zorla '${mesajTipi}' paketi istendi.`, "#00E5FF", aktifModalIstasyonu);
+            toastGoster(`Cihazdan ${mesajTipi} verisi talep edildi.`, "#00E5FF", "📡");
+        }
+        // ==========================================
+        // FATURALANDIRMA (BILLING) MOTORU - HOLOGRAM
+        // ==========================================
+        function faturaGoster(stationId, txId, kwh) {
+            const birimFiyat = 9.50; // 1 kWh = 9.50 TL
+            const baglantiUcreti = 15.00; // Sabit açılış ücreti
+
+            const enerjiTutari = parseFloat(kwh) * birimFiyat;
+            const toplamTutar = (enerjiTutari + baglantiUcreti).toFixed(2);
+
+            const faturaDiv = document.createElement("div");
+            faturaDiv.className = "fatura-makbuz-holo";
+            faturaDiv.innerHTML = `
+        <div class="laser-cizgi"></div>
+        <div class="fatura-baslik">⚡ HOLOGRAM_RECEIPT ⚡</div>
+        <div class="fatura-detay"><span>TARGET_STATION:</span> <span class="vurgu">${stationId}</span></div>
+        <div class="fatura-detay"><span>TRANSACTION_ID:</span> <span>${txId || 'SYS_ERR_00'}</span></div>
+        <div class="fatura-detay"><span>ENERGY_CONSUMED:</span> <span class="vurgu">${kwh} kWh</span></div>
+        <div class="fatura-detay"><span>RATE:</span> <span>${birimFiyat.toFixed(2)} ₺/kWh</span></div>
+        <div class="fatura-detay"><span>CONNECT_FEE:</span> <span>${baglantiUcreti.toFixed(2)} ₺</span></div>
+        <hr class="siber-ayrac">
+        <div class="fatura-toplam"><span>TOTAL_DUE:</span> <span class="tutar-parlak">${toplamTutar} ₺</span></div>
+        <button class="fatura-btn-holo" onclick="this.parentElement.remove()">[ ONAYLA VE BAĞLANTIYI KES ]</button>
+    `;
+
+            document.body.appendChild(faturaDiv);
+
+            // Başarıyla oluşturulduğuna dair sistem bildirimi
+            toastGoster("Şarj tamamlandı. Holografik veri transferi başarılı.", "#00E5FF", "💠");
+        }
 
         // ==========================================
         // CSMS BAŞLATMA VE ARAYÜZ SIFIRLAMA
@@ -1354,35 +1573,73 @@
             document.getElementById("btn-baglan").disabled = false;
         }
 
+        // ==========================================
+        // DİNAMİK DAKTİLO (TYPEWRITER) LOG MOTORU
+        // ==========================================
         function logYaz(mesaj, renk = "#aaa", istasyonId = null) {
             const saat = new Date().toLocaleTimeString();
-            // Satıriçi stiller yerine CSS class'ı ve dinamik renk ataması kullanıldı
-            const logSatiri = `<span class="log-saat">[${saat}]</span> <span style="color: ${renk};">${mesaj}</span><br>`;
 
-            terminal.insertAdjacentHTML('beforeend', logSatiri);
+            // Mesajın içeriğine göre hata/kopma varsa Glitch efektini tetikle
+            const hataMi = mesaj.includes("FAULTED") || mesaj.includes("koptu") || mesaj.includes("kapatıldı") || mesaj.includes("Hata");
+            const ekstraSinif = hataMi ? "glitch-efekti" : "";
 
-            if (terminal.childElementCount > 300) {
-                terminal.removeChild(terminal.firstChild);
+            // Yeni log satırı için DOM elementi oluştur (Eski <br> yerine <div> kullanıyoruz)
+            const satirDiv = document.createElement("div");
+            satirDiv.className = "log-satiri";
+            satirDiv.innerHTML = `<span class="log-saat">[${saat}]</span> <span class="log-metin ${ekstraSinif}" style="color: ${renk};"></span>`;
+
+            terminal.appendChild(satirDiv);
+
+            const metinSpani = satirDiv.querySelector(".log-metin");
+            let harfIndex = 0;
+
+            // Asıl Daktilo (Harf Harf Yazdırma) Fonksiyonu
+            function daktiloYaz() {
+                if (harfIndex < mesaj.length) {
+                    metinSpani.innerHTML += mesaj.charAt(harfIndex);
+                    harfIndex++;
+                    terminal.scrollTop = terminal.scrollHeight; // Terminali sürekli en alta kaydır
+                    setTimeout(daktiloYaz, 10); // Yazım hızı (10ms = Oldukça akıcı ve hızlı)
+                }
+            }
+            daktiloYaz();
+
+            // Terminalin çok şişmesini engelle (Max 150 satır)
+            if (terminal.childElementCount > 150) {
                 terminal.removeChild(terminal.firstChild);
             }
-            terminal.scrollTop = terminal.scrollHeight;
 
+            // İstasyon hafızasına statik olarak kaydet ve gerekirse Yan Panele yazdır
             if (istasyonId) {
                 const cihaz = istasyonlar.find(c => c.id === istasyonId);
                 if (cihaz) {
-                    cihaz.logs.push(logSatiri);
+                    // Cihazın geçmiş logları için anında tam metni kaydediyoruz
+                    const statikLog = `<div class="log-satiri"><span class="log-saat">[${saat}]</span> <span class="${ekstraSinif}" style="color: ${renk};">${mesaj}</span></div>`;
+                    cihaz.logs.push(statikLog);
+
+                    // Eğer o an cihazın yan paneli açıksa, oradaki terminale de daktilo ile yaz
                     if (aktifModalIstasyonu === istasyonId) {
                         const mTerminal = document.getElementById("modal-terminal");
-                        mTerminal.insertAdjacentHTML('beforeend', logSatiri);
-                        mTerminal.scrollTop = mTerminal.scrollHeight;
+                        const mSatirDiv = satirDiv.cloneNode(true);
+                        const mMetinSpani = mSatirDiv.querySelector(".log-metin");
+                        mMetinSpani.innerHTML = ""; // İçini boşalt, harf harf dolacak
+
+                        mTerminal.appendChild(mSatirDiv);
+
+                        let mHarfIndex = 0;
+                        function mDaktiloYaz() {
+                            if (mHarfIndex < mesaj.length) {
+                                mMetinSpani.innerHTML += mesaj.charAt(mHarfIndex);
+                                mHarfIndex++;
+                                mTerminal.scrollTop = mTerminal.scrollHeight;
+                                setTimeout(mDaktiloYaz, 10);
+                            }
+                        }
+                        mDaktiloYaz();
                     }
                 }
             }
         }
-
-        // ==========================================
-        // WEBSOCKET KÖPRÜSÜ (JAVA İLE HABERLEŞME)
-        // ==========================================
         // ==========================================
         // WEBSOCKET KÖPRÜSÜ (JAVA İLE HABERLEŞME)
         // ==========================================
@@ -1433,12 +1690,17 @@
 
                         case "StopTransaction":
                             const duranCihaz = istasyonlar.find(c => c.id === stationId);
+                            let hesaplananKwh = (data.meterStop / 1000).toFixed(2);
+
                             if (duranCihaz) {
                                 duranCihaz.transactionId = null;
-                                // Gelen meterStop (Wh) değerini kWh'a çeviriyoruz
-                                duranCihaz.harcananKwh = (data.meterStop / 1000).toFixed(2);
+                                duranCihaz.harcananKwh = hesaplananKwh;
                             }
                             logYaz(`[ŞARJ BİTTİ] ${stationId} - Toplam Enerji: ${data.meterStop} Wh`, "#D500F9", stationId);
+
+                            // [YENİ] Faturayı (Makbuzu) Ekrana Düşür!
+                            faturaGoster(stationId, data.transactionId, hesaplananKwh);
+
                             if (aktifModalIstasyonu === stationId) modalGorselleriniGuncelle();
                             break;
 
@@ -1509,12 +1771,22 @@
             makine.onclose = function () {
                 logYaz("Java sunucusu ile bağlantı koptu veya kapatıldı.", "#FF1744");
 
-                // Bağlantı kopunca butonu normal haline geri çevir (Manuel bağlanma için)
+                const btn = document.getElementById("btn-baglan");
                 btn.disabled = false;
                 btn.innerText = "🔌 Sunucuya Bağlan";
                 btn.style.backgroundColor = "#005A9E";
 
-                toastGoster("Sunucu Bağlantısı Kesildi!", "#FF1744", "🚨");
+                // --- YENİ EKLENEN TEMİZLİK KODLARI ---
+                document.getElementById("grid-container").innerHTML = ""; // Ekrandaki kutuları sil
+                istasyonlar.length = 0; // Hafızadaki cihazları sil
+                istatistikleriHesapla(); // Sol menüdeki rakamları sıfırla
+
+                if (aktifModalIstasyonu) {
+                    modalKapat(); // Eğer bir cihazın yan paneli açıksa onu da zorla kapat
+                }
+                // ------------------------------------
+
+                toastGoster("Sunucu Bağlantısı Kesildi! İstasyonlar ağdan düşürüldü.", "#FF1744", "🚨");
             };
         }
         // ==========================================
@@ -1714,7 +1986,10 @@
             grafikBaslatVeyaSifirla();
             aktifModalIstasyonu = id;
             document.getElementById("modal-istasyon-isim").innerHTML = `<span style="color:#888; font-size:14px; margin-right:5px;">STATION:</span> ${id}`;
-            document.getElementById("istasyon-modal").style.display = "flex";
+
+            // Paneli kaydırarak aç
+            document.getElementById("istasyon-detay-panel").classList.add("acik");
+
             modalGorselleriniGuncelle();
 
             const cihaz = istasyonlar.find(c => c.id === id);
@@ -1724,7 +1999,8 @@
         }
 
         function modalKapat() {
-            document.getElementById("istasyon-modal").style.display = "none";
+            // Paneli sağa doğru kaydırarak gizle
+            document.getElementById("istasyon-detay-panel").classList.remove("acik");
             aktifModalIstasyonu = null;
         }
 
@@ -1737,7 +2013,23 @@
             const kwhGosterge = document.getElementById("modal-kwh-deger");
             const donut = document.getElementById("modal-donut");
             const topology = document.getElementById("sim-topology");
+            const panel = document.getElementById("istasyon-detay-panel"); // Paneli seçiyoruz
 
+            // DURUMA GÖRE PANEL NEON KENARLIĞI VE GÖLGESİ
+            const renkHaritasi = {
+                "AVAILABLE": "var(--available)",
+                "PREPARING": "var(--preparing)",
+                "CHARGING": "var(--charging)",
+                "FINISHING": "var(--finishing)",
+                "FAULTED": "var(--faulted)",
+                "UNAVAILABLE": "var(--unavailable)"
+            };
+
+            const aktifRenk = renkHaritasi[cihaz.status] || "var(--border-renk)";
+            panel.style.borderLeftColor = aktifRenk;
+            panel.style.boxShadow = `-10px 0 40px ${aktifRenk}33`; // 33 hex = %20 opacity glow
+
+            // İçerik güncellemeleri
             if (cihaz.status === "CHARGING") {
                 kwGosterge.innerText = cihaz.anlikKw || "0.0";
                 kwGosterge.style.color = "#00E5FF";
