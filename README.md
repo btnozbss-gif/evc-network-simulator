@@ -40,6 +40,8 @@ javac -d bin -cp ".:lib/*" src/*.java
 # Start the server
 java -cp ".:lib/*:bin" OcppServer
 
+```
+
 > **Note:** Once started, the server listens for OCPP devices on port `8887` and serves the Web UI bridge on port `8888`.
 
 ## 2. Accessing the Frontend (Management Panel)
